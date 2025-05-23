@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login/Login';
 import SignUp from './components/Login/Signup';
 import Admin from './components/Admin/Admin'; // Example protected page
-import ProtectedRoute from './ProtectedRoute';
-
 
 function App() {
   return (
@@ -13,9 +11,8 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
- <ProtectedRoute>
-      <Admin />
-    </ProtectedRoute>        {/* Add more routes as needed */}
+        <Route path="/admin" element={<Admin />} />
+        {/* Add more routes as needed */}
       </Routes>
     </Router>
   );
