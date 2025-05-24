@@ -1,64 +1,97 @@
 import React, { useState } from 'react';
-import { db } from '../Firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../Firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 
 function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'danger'
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
 
     try {
-      const adminRef = doc(db, 'Admin', email);
-      const adminSnap = await getDoc(adminRef);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      if (adminSnap.exists()) {
-        alert("Admin already exists with this email!");
-        return;
-      }
+      await setDoc(doc(db, 'Admin', user.uid), {
+        email: user.email,
+        uid: user.uid,
+        role: 'admin',
+      });
 
-      await setDoc(adminRef, { email, password });
+      setMessageType('success');
+      setMessage('Admin Registered Successfully!');
 
-      alert("Admin Registered Successfully!");
-      navigate('/login');
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
     } catch (error) {
-      alert("Error: " + error.message);
+      setMessageType('danger');
+      setMessage('User already exists. Use another email');
     }
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '400px' }}>
-      <h2 className="mb-4 text-center">Admin Sign Up</h2>
-      <form onSubmit={handleSignUp}>
-        <div className="mb-3">
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Enter Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Enter Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary w-100">Sign Up</button>
-      </form>
+    <div
+      className="d-flex align-items-center justify-content-center vh-100 bg-light"
+      style={{ padding: '15px' }}
+    >
+      <div className="card shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <h2 className="mb-4 text-center fw-bold text-primary">Admin Sign Up</h2>
+        <form onSubmit={handleSignUp}>
+          <div className="mb-3">
+            <label htmlFor="emailInput" className="form-label">
+              Email address
+            </label>
+            <input
+              id="emailInput"
+              type="email"
+              className="form-control"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="passwordInput" className="form-label">
+              Password
+            </label>
+            <input
+              id="passwordInput"
+              type="password"
+              className="form-control"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="new-password"
+            />
+          </div>
 
-      <p className="text-center mt-3">
-  Already have an account? <Link to="/login">Login here</Link>
-</p>
+          {message && (
+            <div className={`alert alert-${messageType} mt-3`} role="alert">
+              {message}
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary w-100 mt-3 fw-semibold">
+            Sign Up
+          </button>
+        </form>
+        <p className="text-center mt-4 mb-0">
+          Already have an account?{' '}
+          <Link to="/login" className="text-decoration-none fw-semibold text-primary">
+            Login here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

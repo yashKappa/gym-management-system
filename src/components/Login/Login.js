@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { db } from '../Firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { auth } from '../Firebase';
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -9,71 +10,87 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
+  // Auto-login if user already authenticated
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        Cookies.set('session', user.uid, { expires: 7 });
+        navigate('/admin');
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const adminRef = doc(db, 'Admin', email);
-      const adminSnap = await getDoc(adminRef);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      if (!adminSnap.exists()) {
-        setErrorMsg('Admin not Exist or Email / Password wrong');
-        return;
-      }
-
-      const adminData = adminSnap.data();
-
-      if (adminData.password !== password) {
-        setErrorMsg('Admin not Exist or Email / Password wrong');
-        return;
-      }
-
-      if (adminData.password === password) {
-  setErrorMsg('');
-  localStorage.setItem('adminEmail', email);  // Save login info
-  navigate('/admin');
-}
-
-
-      // Successful login
+      Cookies.set('session', user.uid, { expires: 7 });
       setErrorMsg('');
-      navigate('/admin');  // redirect to Admin page
+      navigate('/admin');
     } catch (error) {
-      setErrorMsg("Login failed: " + error.message);
+      setErrorMsg("Invalid email or password. Try again");
     }
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '400px' }}>
-      <h2 className="mb-4 text-center">Admin Login</h2>
-      <form onSubmit={handleLogin}>
-        <div className="mb-3">
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Enter Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Enter Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary w-100">Login</button>
-      </form>
-      {errorMsg && <div className="alert alert-danger mt-3">{errorMsg}</div>}
+    <div
+      className="d-flex align-items-center justify-content-center vh-100 bg-light"
+      style={{ padding: '15px' }}
+    >
+      <div className="card shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <h2 className="mb-4 text-center fw-bold text-primary">Admin Login</h2>
+        <form onSubmit={handleLogin}>
+          <div className="mb-3">
+            <label htmlFor="emailInput" className="form-label">
+              Email address
+            </label>
+            <input
+              id="emailInput"
+              type="email"
+              className="form-control"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="username"
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="passwordInput" className="form-label">
+              Password
+            </label>
+            <input
+              id="passwordInput"
+              type="password"
+              className="form-control"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+          </div>
 
-      <p className="text-center mt-3">
-  Don't have an account? <Link to="/signup">Sign up here</Link>
-</p>
+          {errorMsg && (
+            <div className="alert alert-danger mt-3" role="alert">
+              {errorMsg}
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary w-100 mt-3 fw-semibold">
+            Login
+          </button>
+        </form>
+        <p className="text-center mt-4 mb-0">
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-decoration-none fw-semibold text-primary">
+            Sign up here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
