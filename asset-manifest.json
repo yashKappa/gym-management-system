@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/gym-management-system/static/css/main.d17f6a13.css",
-    "main.js": "/gym-management-system/static/js/main.50f4b009.js",
+    "main.css": "/gym-management-system/static/css/main.f9fcb35a.css",
+    "main.js": "/gym-management-system/static/js/main.e1d813c0.js",
     "index.html": "/gym-management-system/index.html",
-    "main.d17f6a13.css.map": "/gym-management-system/static/css/main.d17f6a13.css.map",
-    "main.50f4b009.js.map": "/gym-management-system/static/js/main.50f4b009.js.map"
+    "main.f9fcb35a.css.map": "/gym-management-system/static/css/main.f9fcb35a.css.map",
+    "main.e1d813c0.js.map": "/gym-management-system/static/js/main.e1d813c0.js.map"
   },
   "entrypoints": [
-    "static/css/main.d17f6a13.css",
-    "static/js/main.50f4b009.js"
+    "static/css/main.f9fcb35a.css",
+    "static/js/main.e1d813c0.js"
   ]
 }
