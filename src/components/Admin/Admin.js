@@ -103,7 +103,7 @@ const [activeSection, setActiveSection] = useState(
         <nav className="navbar navbar-light px-3 justify-content-between align-items-center p-2">
 
             <img
-    src={logo}
+    src="/assets/g-logo1.png"
     alt="Gym Logo"
     style={{ width: '80px' }}
     className="d-block d-md-none"
