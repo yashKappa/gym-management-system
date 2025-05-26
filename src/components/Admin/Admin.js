@@ -1,29 +1,126 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { auth } from '../Firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
+import Dashboard from './Dashboard';
+import Members from './Members';
+import FeePackage from './FeePackage';
+import Notification from './Notification';
+import Supplement from './Supplement';
+import DietDetails from './DietDetails';
+import logo from '../assets/g-logo1.png'; // adjust path based on file location
+import './Admin.css';
 
 function Admin() {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+const [activeSection, setActiveSection] = useState(
+  localStorage.getItem('activeSection') || '📊 Dashboard'
+);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);               // Firebase Auth logout
-      localStorage.removeItem('adminEmail'); // Optional: clear local storage
-      navigate('/login');               // Redirect to login
+      await signOut(auth);
+      localStorage.removeItem('adminEmail');
+      navigate('/login');
     } catch (error) {
-      console.error("Logout failed:", error);
       alert("Logout failed: " + error.message);
     }
   };
 
+  const renderSection = () => {
+    switch (activeSection) {
+      case '📊 Dashboard':
+        return <Dashboard />;
+      case '👥 Members':
+        return <Members />;
+      case '💰 Fee Package':
+        return <FeePackage />;
+      case '🔔 Notification':
+        return <Notification />;
+      case '💊 Supplement':
+        return <Supplement />;
+      case '🥗 Diet Details':
+        return <DietDetails />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  const handleSectionClick = (section) => {
+  setActiveSection(section);
+  localStorage.setItem('activeSection', section); // persist
+  setSidebarOpen(false);
+};
 
   return (
-    <div className="container mt-5">
-      <h1>Welcome, Admin</h1>
-      <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
-      {/* Your admin page content */}
+    <div className="d-flex flex-column flex-md-row min-vh-100">
+      {/* Sidebar */}
+      <div className={`sidebar bg-dark text-white p-3 ${sidebarOpen ? 'show' : ''}`}>
+      <div className="d-flex flex-column justify-content-center align-items-center pb-4">
+  <img
+    src={logo}
+    alt="Gym Logo"
+    style={{ width: '120px' }}
+    className="d-none d-md-block pt-3"
+  />
+  <h4 className="text-white d-none d-md-block">Akatsuki-Gym</h4>
+</div>
+
+        <button
+          className="btn btn-outline-light d-block d-md-none mb-3"
+          onClick={() => setSidebarOpen(false)}
+        >
+          ✕ Close
+        </button>
+
+          {['📊 Dashboard', '👥 Members', '💰 Fee Package', '🔔 Notification', '💊 Supplement', '🥗 Diet Details'].map(section => (
+  <div
+    key={section}
+    onClick={() => handleSectionClick(section)}
+    className={`py-2 px-3 mb-2 sidebar-item ${
+      activeSection === section ? 'bg-secondary text-white' : ''
+    } rounded`}
+    style={{ cursor: 'pointer' }}
+  >
+    {section}
+  </div>
+))}
+
+
+        {/* Logout inside sidebar for mobile */}
+        <button
+          className="m-log btn btn-danger mt-3 d-block d-md-none"
+          onClick={handleLogout}
+        >
+          Logout <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-grow-1 bg-light">
+        <nav className="navbar navbar-light px-3 justify-content-between p-2">
+          {/* Hamburger toggle on mobile */}
+        <button
+  className="menu btn btn-outline-dark d-md-none"
+  onClick={() => setSidebarOpen(!sidebarOpen)}
+  style={{ marginLeft: 'auto' }}
+>
+  ☰ Menu
+</button>
+
+         <button
+  className="logout btn d-none d-md-block ms-auto"
+  onClick={handleLogout}
+>
+  Logout <i class="fa-solid fa-right-from-bracket"></i>
+</button>
+
+        </nav>
+
+        <div className="p-4">{renderSection()}</div>
+      </div>
     </div>
   );
 }

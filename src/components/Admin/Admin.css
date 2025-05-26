@@ -1,0 +1,70 @@
+/* Sidebar base styles */
+.sidebar {
+  width: 250px;
+  transition: transform 0.3s ease;
+}
+
+.navbar {
+  display: flex;
+  justify-content: flex-end; /* move content to right */
+  align-items: center;
+  padding: 0 1rem;
+  background-color: #343a40;
+}
+
+
+.logout{
+    background-color: aliceblue;
+    padding: 2px 5px;
+    font-weight: 500;
+}
+
+.logout:hover{
+    background-color: rgb(248, 81, 81);
+    color: white;
+    font-weight: 500;
+}
+
+.menu {
+  background-color: white !important;
+  color: black !important;  
+  border-color: black !important; 
+}
+
+.m-log{
+    width: 100%;
+
+}
+
+.sidebar-item:hover {
+  background-color: #495057;
+  color: white;
+}
+
+
+/* Desktop: sidebar static on left */
+@media (min-width: 768px) {
+  .sidebar {
+    position: relative;
+    transform: translateX(0);
+  }
+}
+
+/* Mobile: sidebar fixed to right, initially hidden */
+@media (max-width: 767.98px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;             /* Position from right */
+    height: 100vh;
+    background-color: #343a40;
+    z-index: 1050;        /* higher than other content */
+    transform: translateX(100%); /* Hide off screen right */
+  }
+
+  /* When sidebar is open */
+  .sidebar.show {
+    transform: translateX(0);  /* Slide in */
+  }
+
+}
