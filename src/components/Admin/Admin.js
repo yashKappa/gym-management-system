@@ -9,7 +9,7 @@ import FeePackage from './FeePackage';
 import Notification from './Notification';
 import Supplement from './Supplement';
 import DietDetails from './DietDetails';
-import logo from '../assets/g-logo1.png'; // adjust path based on file location
+import logo from '../assets/g-logo1.png'; 
 import './Admin.css';
 
 function Admin() {
