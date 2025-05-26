@@ -9,7 +9,6 @@ import FeePackage from './FeePackage';
 import Notification from './Notification';
 import Supplement from './Supplement';
 import DietDetails from './DietDetails';
-import logo from '../assets/g-logo1.png'; 
 import './Admin.css';
 
 function Admin() {
@@ -60,7 +59,7 @@ const [activeSection, setActiveSection] = useState(
       <div className={`sidebar bg-dark text-white p-3 ${sidebarOpen ? 'show' : ''}`}>
       <div className="d-flex flex-column justify-content-center align-items-center pb-4">
   <img
-    src={logo}
+    src="/assets/g-logo1.png"
     alt="Gym Logo"
     style={{ width: '120px' }}
     className="d-none d-md-block pt-3"
