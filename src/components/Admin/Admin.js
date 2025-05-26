@@ -59,7 +59,7 @@ const [activeSection, setActiveSection] = useState(
       <div className={`sidebar bg-dark text-white p-3 ${sidebarOpen ? 'show' : ''}`}>
       <div className="d-flex flex-column justify-content-center align-items-center pb-4">
   <img
-    src="/assets/g-logo1.png"
+  src={`${process.env.PUBLIC_URL}/assets/g-logo1.png`}
     alt="Gym Logo"
     style={{ width: '120px' }}
     className="d-none d-md-block pt-3"
@@ -103,7 +103,7 @@ const [activeSection, setActiveSection] = useState(
         <nav className="navbar navbar-light px-3 justify-content-between align-items-center p-2">
 
             <img
-    src="/assets/g-logo1.png"
+  src={`${process.env.PUBLIC_URL}/assets/g-logo1.png`}
     alt="Gym Logo"
     style={{ width: '80px' }}
     className="d-block d-md-none"
