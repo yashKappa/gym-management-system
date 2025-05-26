@@ -98,10 +98,18 @@ const [activeSection, setActiveSection] = useState(
         </button>
       </div>
 
+
       {/* Main Content */}
       <div className="flex-grow-1 bg-light">
-        <nav className="navbar navbar-light px-3 justify-content-between p-2">
-          {/* Hamburger toggle on mobile */}
+        <nav className="navbar navbar-light px-3 justify-content-between align-items-center p-2">
+
+            <img
+    src={logo}
+    alt="Gym Logo"
+    style={{ width: '80px' }}
+    className="d-block d-md-none"
+  />
+  
         <button
   className="menu btn btn-outline-dark d-md-none"
   onClick={() => setSidebarOpen(!sidebarOpen)}
