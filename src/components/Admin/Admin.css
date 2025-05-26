@@ -1,17 +1,30 @@
 /* Sidebar base styles */
+
+
 .sidebar {
   width: 250px;
   transition: transform 0.3s ease;
+  z-index: 1;
 }
-
+  
 .navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  right: 0;
+  height: 56px; /* adjust as needed */
+  background-color: #343a40;
   display: flex;
-  justify-content: flex-end; /* move content to right */
   align-items: center;
   padding: 0 1rem;
-  background-color: #343a40;
 }
 
+.flex-grow-1 {
+  margin-top: 56px; /* leave space for navbar */
+  height: calc(100vh - 56px);
+  overflow-y: auto; /* enable scroll for main content only */
+  background-color: #f8f9fa;
+}
 
 .logout{
     background-color: aliceblue;
@@ -40,6 +53,9 @@
   color: white;
 }
 
+::-webkit-scrollbar{
+  display: none;
+}
 
 /* Desktop: sidebar static on left */
 @media (min-width: 768px) {
@@ -47,6 +63,7 @@
     position: relative;
     transform: translateX(0);
   }
+
 }
 
 /* Mobile: sidebar fixed to right, initially hidden */

@@ -4,7 +4,7 @@ import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
 import Dashboard from './Dashboard';
-import Members from './Members';
+import Members from './member/Members';
 import FeePackage from './FeePackage';
 import Notification from './Notification';
 import Supplement from './Supplement';
@@ -55,7 +55,6 @@ const [activeSection, setActiveSection] = useState(
 
   return (
     <div className="d-flex flex-column flex-md-row min-vh-100">
-      {/* Sidebar */}
       <div className={`sidebar bg-dark text-white p-3 ${sidebarOpen ? 'show' : ''}`}>
       <div className="d-flex flex-column justify-content-center align-items-center pb-4">
   <img
