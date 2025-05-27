@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import './Members.css';
 import { db } from '../../Firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const Add = () => {
   const [showForm, setShowForm] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -21,35 +22,43 @@ const Add = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setErrorMessage(''); // Clear previous error
+
+    // Check if member with same name exists
+    const memberDocRef = doc(db, 'member', formData.name);
+    const memberDocSnap = await getDoc(memberDocRef);
+
+    if (memberDocSnap.exists()) {
+      setErrorMessage('Member name already exists');
+      return; // Stop submission
+    }
+
     const initials = formData.name
       .split(' ')
-      .map(word => word[0].toUpperCase())
+      .map(word => word[0] ? word[0].toUpperCase() : '')
       .join('');
 
     const contactSuffix = formData.contact.slice(-4);
     const randomNum = Math.floor(100 + Math.random() * 900);
     const accessCode = `${initials}${contactSuffix}${randomNum}`;
 
-    console.log('New Member:', formData);
-    console.log('Generated Access Code:', accessCode);
-
     try {
-      await setDoc(doc(db, 'member', formData.name), {
+      await setDoc(memberDocRef, {
         ...formData,
         accessCode,
         timestamp: new Date()
       });
 
       setSuccessMessage(`Member added successfully! Access Code: ${accessCode}`);
+
+      setShowForm(false);
+      setFormData({ name: '', contact: '', joiningDateTime: '', trainer: 'None' });
+
+      setTimeout(() => setSuccessMessage(''), 5000);
     } catch (error) {
       console.error('Error adding document: ', error);
-      setSuccessMessage(`❌ Failed to add member: ${error.message}`);
+      setErrorMessage(`❌ Failed to add member: ${error.message}`);
     }
-
-    setShowForm(false);
-    setFormData({ name: '', contact: '', joiningDateTime: '', trainer: 'None' });
-
-    setTimeout(() => setSuccessMessage(''), 5000);
   };
 
   return (
@@ -59,7 +68,7 @@ const Add = () => {
       </button>
 
       {successMessage && (
-        <div className='success'>
+        <div className="success">
           <span>{successMessage}</span>
         </div>
       )}
@@ -96,6 +105,11 @@ const Add = () => {
                 <option value="None">None</option>
                 <option value="Personal Trainer">Personal Trainer</option>
               </select>
+                {errorMessage && (
+        <div className="error">
+          <span>{errorMessage}</span>
+        </div>
+      )}
               <div className="form-buttons">
                 <button type="submit" className="submit-btn">Submit</button>
                 <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>

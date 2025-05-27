@@ -1,91 +1,129 @@
-// src/components/Admin/member/mem-fetch.js
 import React, { useEffect, useState } from 'react';
 import { db } from '../../Firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import Receipt from './Receipt';
+
 
 const MemFetch = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [lastUpdated, setLastUpdated] = useState(null);
-
-  const fetchMembers = async () => {
-    try {
-      setLoading(true);
-      const membersCollection = collection(db, 'member');
-      const snapshot = await getDocs(membersCollection);
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMembers(data);
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error) {
-      console.error('Error fetching members:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [confirmId, setConfirmId] = useState(null);
+  const [message, setMessage] = useState('');
+const [selectedMember, setSelectedMember] = useState(null);
 
   useEffect(() => {
     fetchMembers();
   }, []);
 
-  // Filter members based on searchQuery
-  const filteredMembers = members.filter(member =>
+  const fetchMembers = async () => {
+    try {
+      setLoading(true);
+      const snapshot = await getDocs(collection(db, 'member'));
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setMembers(data);
+    } catch (error) {
+      setMessage('Failed to fetch members.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteMember = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'member', id));
+      setMembers(prev => prev.filter(m => m.id !== id));
+      setMessage('Member deleted successfully.');
+    } catch {
+      setMessage('Failed to delete member.');
+    } finally {
+      setConfirmId(null);
+      setTimeout(() => setMessage(''), 3000);
+    }
+  };
+
+  const filtered = members.filter(member =>
     Object.values(member).some(val =>
       String(val).toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
 
   return (
-    <div className="container">
+    <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="mb-0">All Members</h3>
-        <button className="refresh" onClick={fetchMembers} disabled={loading}>
-          <i class="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
+        <h4>All Members</h4>
+        <button className="btn btn-primary" onClick={fetchMembers} disabled={loading}>
+          {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 
-      <div className="mb-3">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search by name, contact, or trainer..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-        />
-      </div>
+      {message && <div className="alert alert-info">{message}</div>}
 
-      <p >
-        Total Members: <strong>{filteredMembers.length}</strong>
-      </p>
+      <input
+        type="text"
+        className="form-control mb-3"
+        placeholder="Search..."
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+      />
+
+      <p>Total: <strong>{filtered.length}</strong> members</p>
 
       <div className="table-responsive">
-        <table className="table table-bordered table-striped table-hover">
-          <thead className="table-success">
+        <table className="table table-bordered table-hover">
+          <thead className="table-light">
             <tr>
               <th>Name</th>
               <th>Contact</th>
               <th>Joining Date</th>
               <th>Trainer</th>
+              <th>Access Code</th>
+              <th>Receipt</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
-            {filteredMembers.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="text-center">No matching members found.</td>
-              </tr>
+            {filtered.length === 0 ? (
+              <tr><td colSpan="6" className="text-center">No members found.</td></tr>
             ) : (
-              filteredMembers.map((member, idx) => (
-                <tr key={idx}>
-                  <td>{member.name}</td>
-                  <td>{member.contact}</td>
-                  <td>{new Date(member.joiningDateTime).toLocaleString()}</td>
-                  <td>{member.trainer}</td>
+              filtered.map(m => (
+                <tr key={m.id}>
+                  <td>{m.name}</td>
+                  <td>{m.contact}</td>
+                  <td>{new Date(m.joiningDateTime).toLocaleString()}</td>
+                  <td>{m.trainer}</td>
+                  <td>{m.accessCode}</td>
+ <td>
+                <button onClick={() => setSelectedMember(m)}>Receipt</button>
+              </td>                  <td className='del'>
+                    <button  onClick={() => setConfirmId(m.id)}><i class="fa-solid fa-trash"></i></button>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
+    {selectedMember && (
+      <Receipt
+        member={selectedMember}
+        onClose={() => setSelectedMember(null)}
+      />
+    )}
       </div>
+
+      {/* Simple Delete Confirmation */}
+      {confirmId && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
+          <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>
+            <h5 className="mb-3">Confirm Deletion</h5>
+            <p>Are you sure you want to delete this member?</p>
+            <div className="confirm d-flex justify-content-end">
+              <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
+              <button className="btn btn-danger" onClick={() => deleteMember(confirmId)}>Yes, Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

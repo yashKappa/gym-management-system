@@ -135,3 +135,32 @@ input:focus{
         min-width: 100%;
     }
 }
+
+.del{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.del button{
+  border: none;
+  background-color: rgba(255, 255, 255, 0);
+  transition: 0.2s;
+}
+
+.del button:hover{
+    color: red;
+}
+
+.confirm button{
+  padding: 4px 8px;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}

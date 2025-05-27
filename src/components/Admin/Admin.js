@@ -9,6 +9,7 @@ import FeePackage from './FeePackage';
 import Notification from './Notification';
 import Supplement from './Supplement';
 import DietDetails from './DietDetails';
+import Receipt from './member/Receipt';
 import './Admin.css';
 
 function Admin() {
