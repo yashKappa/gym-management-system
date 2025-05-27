@@ -52,8 +52,8 @@ const [selectedMember, setSelectedMember] = useState(null);
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4>All Members</h4>
-        <button className="btn btn-primary" onClick={fetchMembers} disabled={loading}>
-          {loading ? 'Refreshing...' : 'Refresh'}
+        <button className="rec" onClick={fetchMembers} disabled={loading}>
+          <i class="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 
@@ -94,7 +94,7 @@ const [selectedMember, setSelectedMember] = useState(null);
                   <td>{m.trainer}</td>
                   <td>{m.accessCode}</td>
  <td>
-                <button onClick={() => setSelectedMember(m)}>Receipt</button>
+                <button className='rec' onClick={() => setSelectedMember(m)}>Receipt</button>
               </td>                  <td className='del'>
                     <button  onClick={() => setConfirmId(m.id)}><i class="fa-solid fa-trash"></i></button>
                   </td>

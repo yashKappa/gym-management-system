@@ -9,6 +9,7 @@ const Receipt = ({ member, onClose }) => {
 
   // Hooks here, always executed
   const [amountPaid, setAmountPaid] = useState('');
+  const [months, setmonths] = useState('');
   const [date, setDate] = useState(today);
   const [message, setMessage] = useState('');
 
@@ -26,6 +27,7 @@ const Receipt = ({ member, onClose }) => {
       const receiptCollectionRef = collection(db, 'member', member.name, 'Receipt');
       await addDoc(receiptCollectionRef, {
         amountPaid: Number(amountPaid),
+        months: Number(months),
         date,
         createdAt: serverTimestamp(),
         trainer: member.trainer,
@@ -35,6 +37,7 @@ const Receipt = ({ member, onClose }) => {
 
       setMessage('Receipt saved successfully!');
       setAmountPaid('');
+      setmonths('');
       setDate(today);
     } catch (error) {
       console.error('Error saving receipt:', error);
@@ -78,6 +81,17 @@ const Receipt = ({ member, onClose }) => {
             />
           </div>
           <div className="col-md-6 mt-3">
+            <label className="form-label">Months</label>
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Enter Months"
+              value={months}
+              onChange={e => setmonths(e.target.value)}
+              required
+            />
+          </div>
+          <div className="col-md-6 mt-3 d-none">
             <label className="form-label">Date</label>
             <input
               type="date"
@@ -92,7 +106,7 @@ const Receipt = ({ member, onClose }) => {
         {message && <p className="mt-3">{message}</p>}
 
         <div className='sub'>
-          <button type="submit" className="btn btn-primary mt-4">Generate Receipt</button>
+          <button type="submit" className="gen">Generate Receipt</button>
         </div>
       </form>
 

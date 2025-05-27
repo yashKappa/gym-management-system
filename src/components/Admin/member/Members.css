@@ -164,3 +164,14 @@ input:focus{
   margin-bottom: 10px;
   font-weight: 600;
 }
+
+.rec{
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 0.3rem;
+}
+
+.rec:hover{
+  background-color: #414141;
+  color: white;
+}

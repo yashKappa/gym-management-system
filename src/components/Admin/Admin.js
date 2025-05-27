@@ -31,17 +31,17 @@ const [activeSection, setActiveSection] = useState(
 
   const renderSection = () => {
     switch (activeSection) {
-      case '📊 Dashboard':
+      case 'Dashboard':
         return <Dashboard />;
-      case '👥 Members':
+      case 'Members':
         return <Members />;
-      case '💰 Fee Package':
+      case 'Fee Package':
         return <FeePackage />;
-      case '🔔 Notification':
+      case 'Notification':
         return <Notification />;
-      case '💊 Supplement':
+      case 'Supplement':  
         return <Supplement />;
-      case '🥗 Diet Details':
+      case 'Diet Details':
         return <DietDetails />;
       default:
         return <Dashboard />;
@@ -74,16 +74,24 @@ const [activeSection, setActiveSection] = useState(
           ✕ Close
         </button>
 
-          {['📊 Dashboard', '👥 Members', '💰 Fee Package', '🔔 Notification', '💊 Supplement', '🥗 Diet Details'].map(section => (
+          {[
+  { label: 'Dashboard', icon: 'fa-chart-simple' },
+  { label: 'Members', icon: 'fa-users' },
+  { label: 'Fee Package', icon: 'fa-sack-dollar' },
+  { label: 'Notification', icon: 'fa-bell' },
+  { label: 'Supplement', icon: 'fa-capsules' },
+  { label: 'Diet Details', icon: 'fa-apple-alt' }
+].map(({ label, icon }) => (
   <div
-    key={section}
-    onClick={() => handleSectionClick(section)}
-    className={`py-2 px-3 mb-2 sidebar-item ${
-      activeSection === section ? 'bg-secondary text-white' : ''
+    key={label}
+    onClick={() => handleSectionClick(label)}
+    className={`py-2 px-3 mb-2 sidebar-item d-flex align-items-center ${
+      activeSection === label ? 'bg-secondary text-white' : ''
     } rounded`}
     style={{ cursor: 'pointer' }}
   >
-    {section}
+    <i className={`fa-solid ${icon} me-2 d-md-inline`}></i>
+    <span>{label}</span>
   </div>
 ))}
 

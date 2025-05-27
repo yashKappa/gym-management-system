@@ -43,12 +43,10 @@ const ReceiptData = ({ memberName }) => {
     <div>
       <div className="d-flex justify-content-between align-items-center">
         <h4>Receipts for {memberName}</h4>
-        <button onClick={fetchReceipts} className="btn btn-outline-secondary btn-sm">
-          Refresh
-        </button>
+        <button onClick={fetchReceipts} className="rec">
+      <i class="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'} 
+       </button> 
       </div>
-
-      {loading && <p>Loading receipts...</p>}
       {error && <p className="text-danger">{error}</p>}
       {receipts.length === 0 && !loading && <p>No receipts found.</p>}
 
@@ -57,8 +55,8 @@ const ReceiptData = ({ memberName }) => {
           <table className="table table-bordered table-hover">
             <thead className="table-light">
               <tr>
+                                <th>Months</th>
                 <th>Amount Paid</th>
-                <th>Date</th>
                 <th>Trainer</th>
                 <th>Access Code</th>
                 <th>Contact</th>
@@ -68,8 +66,8 @@ const ReceiptData = ({ memberName }) => {
             <tbody>
               {receipts.map(r => (
                 <tr key={r.id}>
+                  <td>{r.months}</td>
                   <td>{r.amountPaid}</td>
-                  <td>{r.date}</td>
                   <td>{r.trainer}</td>
                   <td>{r.accessCode}</td>
                   <td>{r.contact}</td>
