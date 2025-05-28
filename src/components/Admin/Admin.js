@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 import Dashboard from './Dashboard';
 import Members from './member/Members';
-import FeePackage from './FeePackage';
-import Notification from './Notification';
+import FeePackage from '../FeePackage/FeePackage';
+import Notification from '../Notification/Notification';
 import Supplement from './Supplement';
 import DietDetails from './DietDetails';
 import Receipt from './member/Receipt';

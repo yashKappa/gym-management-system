@@ -142,6 +142,7 @@ input:focus{
   align-items: center;
 }
 
+
 .del button{
   border: none;
   background-color: rgba(255, 255, 255, 0);
@@ -174,4 +175,26 @@ input:focus{
 .rec:hover{
   background-color: #414141;
   color: white;
+}
+
+.dels{
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  border-radius: 0.3rem;
+}
+
+.dels:hover{
+  background-color: #ff273c;
+  color: white;
+}
+
+textarea{
+  height: 30vh !important;
+  resize: none;
+}
+
+textarea:focus{
+  box-shadow: none !important;
+  border-color: #7e7e7e !important;
 }

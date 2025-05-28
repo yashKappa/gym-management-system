@@ -12,6 +12,7 @@ const Receipt = ({ member, onClose }) => {
   const [months, setmonths] = useState('');
   const [date, setDate] = useState(today);
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   if (!member) return null;
 
@@ -42,6 +43,9 @@ const Receipt = ({ member, onClose }) => {
     } catch (error) {
       console.error('Error saving receipt:', error);
       setMessage('Failed to save receipt. Try again.');
+    }finally {
+      setLoading(false);
+      setTimeout(() => setMessage(''), 3000);
     }
   };
 
@@ -103,7 +107,9 @@ const Receipt = ({ member, onClose }) => {
           </div>
         </div>
 
-        {message && <p className="mt-3">{message}</p>}
+        {message &&  <div className="success" style={{ width: '100%', marginTop: '-2.5rem'}}>
+          <span>{message}</span>
+        </div>}
 
         <div className='sub'>
           <button type="submit" className="gen">Generate Receipt</button>

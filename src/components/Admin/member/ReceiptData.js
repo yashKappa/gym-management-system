@@ -6,6 +6,7 @@ const ReceiptData = ({ memberName }) => {
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const fetchReceipts = async () => {
     if (!memberName) return;
@@ -17,10 +18,12 @@ const ReceiptData = ({ memberName }) => {
       const snapshot = await getDocs(receiptCollectionRef);
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setReceipts(data);
+      setMessage('Receipt refreshed.');
     } catch (err) {
       setError('Failed to fetch receipts.');
     } finally {
       setLoading(false);
+      setTimeout(() => setMessage(''), 3000);
     }
   };
 
@@ -48,8 +51,18 @@ const ReceiptData = ({ memberName }) => {
        </button> 
       </div>
       {error && <p className="text-danger">{error}</p>}
-      {receipts.length === 0 && !loading && <p>No receipts found.</p>}
+            {message && <div className="alert alert-info">{message}</div>}
 
+      {receipts.length === 0 && !loading && 
+      <div className="text-center mt-4">
+  <img
+    src={`${process.env.PUBLIC_URL}/assets/back.png`}
+    alt="No Receipts"
+    style={{ width: '10%', marginBottom: '10px', marginTop:'20px' }}
+  />
+  <p style={{ margin: 0 }}>No receipts found.</p>
+</div>
+}
       {receipts.length > 0 && (
         <div className="table-responsive mt-3">
           <table className="table table-bordered table-hover">
