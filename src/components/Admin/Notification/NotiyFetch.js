@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../Firebase';
+import { db } from '../../Firebase';
 import { BsBellFill } from 'react-icons/bs';
 
 const alertClasses = ['alert-secondary', 'alert-primary', 'alert-success', 'alert-warning', 'alert-info'];
@@ -10,6 +10,22 @@ const NotificationFetch = () => {
   const [loading, setLoading] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
+  const messageRef = useRef(null);
+
+  const showMessage = (msg) => {
+    setMessage(msg);
+    setTimeout(() => setMessage(''), 3000);
+  };
+
+  const showDeleteMessage = (msg) => {
+    setMessage(msg);
+    setTimeout(() => {
+      if (messageRef.current) {
+        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    setTimeout(() => setMessage(''), 3000);
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -17,13 +33,12 @@ const NotificationFetch = () => {
       const querySnapshot = await getDocs(collection(db, 'Details', 'Notifications', 'details'));
       const notificationList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setNotifications(notificationList);
-      setMessage('Notifications refreshed.');
+      showMessage('Notifications refreshed.');
     } catch (error) {
       console.error('❌ Error fetching notifications:', error);
-      setMessage('Failed to fetch notifications.');
+      showMessage('Failed to fetch notifications.');
     } finally {
       setLoading(false);
-      setTimeout(() => setMessage(''), 3000);
     }
   };
 
@@ -35,13 +50,12 @@ const NotificationFetch = () => {
     try {
       await deleteDoc(doc(db, 'Details', 'Notifications', 'details', id));
       setNotifications(prev => prev.filter(notification => notification.id !== id));
-      setMessage('Notification deleted successfully.');
+      showDeleteMessage('Notification deleted successfully.');
     } catch (error) {
       console.error('❌ Error deleting notification:', error);
-      setMessage('Failed to delete notification.');
+      showDeleteMessage('Failed to delete notification.');
     } finally {
       setConfirmId(null);
-      setTimeout(() => setMessage(''), 3000);
     }
   };
 
@@ -54,7 +68,11 @@ const NotificationFetch = () => {
         </button>
       </div>
 
-      {message && <div className="alert alert-info">{message}</div>}
+      {message && (
+        <div ref={messageRef} className="alert alert-info">
+          {message}
+        </div>
+      )}
 
       {notifications.length === 0 ? (
         <div className="text-center mt-4">

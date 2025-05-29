@@ -67,12 +67,16 @@ const Add = () => {
         <i className="fa-solid fa-plus"></i> Add
       </button>
 
-      {successMessage && (
-        <div className="success">
-          <span>{successMessage}</span>
+     {successMessage && (
+        <div className="alert alert-success" role="alert">
+          {successMessage}
         </div>
       )}
-
+      {errorMessage && (
+        <div className="alert alert-danger" role="alert">
+          {errorMessage}
+        </div>
+      )}
       {showForm && (
         <div className="modal-overlay">
           <div className="modal-content">

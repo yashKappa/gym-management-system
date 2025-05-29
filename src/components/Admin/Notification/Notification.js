@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../Firebase';
+import { db } from '../../Firebase';
 import NotiyFetch from './NotiyFetch';
 
 const Notification = () => {
@@ -33,8 +33,16 @@ const Notification = () => {
     <div className="container pt-4">
       <h3 className="text-center mb-4">Notification</h3>
 
-      {successMessage && <div className="success"><span>{successMessage}</span></div>}
-      {errorMessage && <div className="error"><span>{errorMessage}</span></div>}
+      {successMessage && (
+        <div className="alert alert-success" role="alert">
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div className="alert alert-danger" role="alert">
+          {errorMessage}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="bg-light border p-4 rounded shadow-sm">
         <div className="mb-3">

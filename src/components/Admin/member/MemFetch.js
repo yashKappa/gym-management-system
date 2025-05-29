@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { db } from '../../Firebase';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import Receipt from './Receipt';
@@ -11,6 +11,7 @@ const MemFetch = () => {
   const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
   const [selectedMember, setSelectedMember] = useState(null);
+const messageRef = useRef(null);
 
   useEffect(() => {
     fetchMembers();
@@ -50,9 +51,19 @@ const MemFetch = () => {
 
     // Step 3: Update local state
     setMembers(prev => prev.filter(m => m.id !== id));
-    setMessage('Member and all associated data deleted successfully.');
+setMessage('Member and all associated data deleted successfully.');
+setTimeout(() => {
+  if (messageRef.current) {
+    messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}, 100);
   } catch (error) {
-    setMessage('Failed to delete member and their data.');
+setMessage('Failed to delete member and their data.');
+setTimeout(() => {
+  if (messageRef.current) {
+    messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}, 100);
     console.error('Deletion error:', error);
   } finally {
     setConfirmId(null);
@@ -76,7 +87,11 @@ const MemFetch = () => {
         </button>
       </div>
 
-      {message && <div className="alert alert-info">{message}</div>}
+{message && (
+  <div ref={messageRef} className="alert alert-info">
+    {message}
+  </div>
+)}
 
       <input
         type="text"

@@ -55,6 +55,9 @@ const Receipt = ({ member, onClose }) => {
         <h5>Receipt Form for <strong>{member.name}</strong></h5>
         <button className="btn btn-outline-danger btn-sm" onClick={onClose}>Close</button>
       </div>
+       {message &&  <div className="success alert mt-3">
+          <span>{message}</span>
+        </div>}
       <form onSubmit={handleSubmit}>
         <div className="row mt-3">
   <div className="col-md-6">
@@ -106,10 +109,6 @@ const Receipt = ({ member, onClose }) => {
             />
           </div>
         </div>
-
-        {message &&  <div className="success" style={{ width: '100%', marginTop: '-2.5rem'}}>
-          <span>{message}</span>
-        </div>}
 
         <div className='sub'>
           <button type="submit" className="gen">Generate Receipt</button>

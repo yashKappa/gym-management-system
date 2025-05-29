@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../Firebase';
+import { db } from '../../Firebase';
 import ViewPackages from './ViewPackages';
 
 const FeePackageForm = () => {
@@ -54,15 +54,14 @@ const FeePackageForm = () => {
     <div className="container pt-4">
       <h3 className="text-center mb-4">➕ Add Gym Fee Package</h3>
 
-      {/* Success & Error Messages */}
       {successMessage && (
-        <div className="success">
-          <span>{successMessage}</span>
+        <div className="alert alert-success" role="alert">
+          {successMessage}
         </div>
       )}
       {errorMessage && (
-        <div className="error">
-          <span>{errorMessage}</span>
+        <div className="alert alert-danger" role="alert">
+          {errorMessage}
         </div>
       )}
 
