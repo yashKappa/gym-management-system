@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../../Firebase'; 
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import './Receipt.css';
@@ -7,22 +7,45 @@ import ReceiptData from './ReceiptData';
 const Receipt = ({ member, onClose }) => {
   const today = new Date().toISOString().split('T')[0];
 
-  // Hooks here, always executed
   const [amountPaid, setAmountPaid] = useState('');
-  const [months, setmonths] = useState('');
+  const [months, setMonths] = useState('');
   const [date, setDate] = useState(today);
   const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Ref for message div
+  const messageRef = useRef(null);
+
+  // Effect to focus the message when it appears
+ useEffect(() => {
+  if ((message || errorMessage) && messageRef.current) {
+    messageRef.current.focus();
+    messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}, [message, errorMessage]);
+
+
 
   if (!member) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setMessage('');
+    setErrorMessage('');
+
     if (!amountPaid) {
-      setMessage('Please enter the amount paid.');
+      setErrorMessage('Please enter the amount paid.');
       return;
     }
+
+    if (!months) {
+      setErrorMessage('Please enter the number of months.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const receiptCollectionRef = collection(db, 'member', member.name, 'Receipt');
@@ -38,14 +61,16 @@ const Receipt = ({ member, onClose }) => {
 
       setMessage('Receipt saved successfully!');
       setAmountPaid('');
-      setmonths('');
+      setMonths('');
       setDate(today);
+
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('Error saving receipt:', error);
-      setMessage('Failed to save receipt. Try again.');
-    }finally {
+      setErrorMessage('Failed to save receipt. Try again.');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
       setLoading(false);
-      setTimeout(() => setMessage(''), 3000);
     }
   };
 
@@ -55,12 +80,22 @@ const Receipt = ({ member, onClose }) => {
         <h5>Receipt Form for <strong>{member.name}</strong></h5>
         <button className="btn btn-outline-danger btn-sm" onClick={onClose}>Close</button>
       </div>
-       {message &&  <div className="success alert mt-3">
-          <span>{message}</span>
-        </div>}
+
+      {(message || errorMessage) && (
+        <div
+          tabIndex={-1}               // Make div focusable
+          ref={messageRef}            // Attach ref
+          className={`alert mt-3 ${message ? 'alert-success' : 'alert-danger'}`}
+          aria-live="assertive"       // Announce immediately for screen readers
+          role="alert"                // Role alert for screen readers
+        >
+          {message || errorMessage}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div className="row mt-3">
-  <div className="col-md-6">
+          <div className="col-md-6">
             <label className="form-label">Name</label>
             <input type="text" className="form-control" value={member.name} readOnly />
           </div>
@@ -85,6 +120,7 @@ const Receipt = ({ member, onClose }) => {
               value={amountPaid}
               onChange={e => setAmountPaid(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
           <div className="col-md-6 mt-3">
@@ -94,8 +130,9 @@ const Receipt = ({ member, onClose }) => {
               className="form-control"
               placeholder="Enter Months"
               value={months}
-              onChange={e => setmonths(e.target.value)}
+              onChange={e => setMonths(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
           <div className="col-md-6 mt-3 d-none">
@@ -106,17 +143,19 @@ const Receipt = ({ member, onClose }) => {
               value={date}
               onChange={e => setDate(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
         </div>
 
-        <div className='sub'>
-          <button type="submit" className="gen">Generate Receipt</button>
+        <div className="sub mt-4">
+          <button type="submit" className="gen" disabled={loading}>
+            {loading ? 'Saving...' : 'Generate Receipt'}
+          </button>
         </div>
       </form>
 
-<ReceiptData memberName={member.name} />
-
+      <ReceiptData memberName={member.name} />
     </div>
   );
 };

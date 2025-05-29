@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './Members.css';
 import { db } from '../../Firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
@@ -13,6 +13,9 @@ const Add = () => {
     joiningDateTime: '',
     trainer: 'None',
   });
+
+  const successRef = useRef(null);
+  const errorRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,6 +33,7 @@ const Add = () => {
 
     if (memberDocSnap.exists()) {
       setErrorMessage('Member name already exists');
+      setSuccessMessage('');
       return; // Stop submission
     }
 
@@ -50,7 +54,7 @@ const Add = () => {
       });
 
       setSuccessMessage(`Member added successfully! Access Code: ${accessCode}`);
-
+      setErrorMessage('');
       setShowForm(false);
       setFormData({ name: '', contact: '', joiningDateTime: '', trainer: 'None' });
 
@@ -58,8 +62,14 @@ const Add = () => {
     } catch (error) {
       console.error('Error adding document: ', error);
       setErrorMessage(`❌ Failed to add member: ${error.message}`);
+      setSuccessMessage('');
     }
   };
+
+  useEffect(() => {
+    if (successMessage && successRef.current) successRef.current.focus();
+    if (errorMessage && errorRef.current) errorRef.current.focus();
+  }, [successMessage, errorMessage]);
 
   return (
     <div className="members-container">
@@ -67,16 +77,27 @@ const Add = () => {
         <i className="fa-solid fa-plus"></i> Add
       </button>
 
-     {successMessage && (
-        <div className="alert alert-success" role="alert">
+      {successMessage && (
+        <div
+          className="alert alert-success"
+          role="alert"
+          ref={successRef}
+          tabIndex={-1}
+        >
           {successMessage}
         </div>
       )}
       {errorMessage && (
-        <div className="alert alert-danger" role="alert">
+        <div
+          className="alert alert-danger"
+          role="alert"
+          ref={errorRef}
+          tabIndex={-1}
+        >
           {errorMessage}
         </div>
       )}
+
       {showForm && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -109,9 +130,14 @@ const Add = () => {
                 <option value="None">None</option>
                 <option value="Personal Trainer">Personal Trainer</option>
               </select>
-                {errorMessage && (
-        <div className="error">
-          <span>{errorMessage}</span>
+               {errorMessage && (
+        <div
+          className="alert alert-danger"
+          role="alert"
+          ref={errorRef}
+          tabIndex={-1}
+        >
+          {errorMessage}
         </div>
       )}
               <div className="form-buttons">

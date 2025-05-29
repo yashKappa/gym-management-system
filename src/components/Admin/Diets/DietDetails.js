@@ -1,15 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../Firebase';
-import SupplementsFetch from './SupplementsFetch';
+import ViewDietPlans from './ViewDietPlans';
 
-const Supplement = () => {
-  const [formData, setFormData] = useState({ name: '', image: '', description: '' });
+const DietPlanForm = () => {
+  const [formData, setFormData] = useState({
+    level: '',
+    mealType: '',
+    items: '',
+  });
+
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const successRef = useRef(null);
   const errorRef = useRef(null);
+
+  useEffect(() => {
+    if (successMessage && successRef.current) {
+      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (errorMessage && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center'  });
+    }
+  }, [successMessage, errorMessage]);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -18,31 +32,22 @@ const Supplement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const collectionRef = collection(db, 'Details', 'Supplements', 'details');
+      const collectionRef = collection(db, 'Details', 'Diets', 'plans');
       await addDoc(collectionRef, formData);
 
-      setSuccessMessage('Supplement added successfully!');
-      setFormData({ name: '', image: '', description: '' });
-      setErrorMessage('');
-
+      setSuccessMessage('Diet meal added successfully!');
+      setFormData({ level: '', mealType: '', items: '' });
       setTimeout(() => setSuccessMessage(''), 5000);
     } catch (error) {
-      console.error('Error saving supplement:', error);
+      console.error('Error saving diet plan:', error);
       setErrorMessage(`Failed to save: ${error.message}`);
-      setSuccessMessage('');
-
       setTimeout(() => setErrorMessage(''), 5000);
     }
   };
 
-  useEffect(() => {
-    if (successMessage && successRef.current) successRef.current.focus();
-    if (errorMessage && errorRef.current) errorRef.current.focus();
-  }, [successMessage, errorMessage]);
-
   return (
     <div className="container pt-4">
-      <h3 className="text-center mb-4">💪 Gym Supplement</h3>
+      <h3 className="text-center mb-4">🥗 Add Diet Plan Meal</h3>
 
       {successMessage && (
         <div
@@ -54,6 +59,7 @@ const Supplement = () => {
           {successMessage}
         </div>
       )}
+
       {errorMessage && (
         <div
           className="alert alert-danger"
@@ -67,51 +73,53 @@ const Supplement = () => {
 
       <form onSubmit={handleSubmit} className="bg-light border p-4 rounded shadow-sm">
         <div className="mb-3">
-          <label className="form-label">Supplement Name</label>
+          <label className="form-label">Plan Level</label>
+          <select
+            name="level"
+            className="form-select"
+            value={formData.level}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Level</option>
+            <option value="beginner">Beginner</option>
+            <option value="regular">Regular</option>
+            <option value="professional">Professional</option>
+          </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Meal Type</label>
           <input
             type="text"
-            name="name"
+            name="mealType"
             className="form-control"
-            value={formData.name}
+            value={formData.mealType}
             onChange={handleChange}
-            placeholder="e.g., Whey Protein"
+            placeholder="e.g., Breakfast, Snack, Dinner"
             required
           />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Image URL (e.g., /assets/whey.png)</label>
-          <input
-            type="text"
-            name="image"
-            className="form-control"
-            value={formData.image}
-            onChange={handleChange}
-            placeholder="/assets/your-image.png"
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Description</label>
+          <label className="form-label">Meal Items</label>
           <textarea
-            name="description"
+            name="items"
             className="form-control"
-            value={formData.description}
+            value={formData.items}
             onChange={handleChange}
-            placeholder="Short description of the supplement"
+            placeholder="e.g., Oats, 2 boiled eggs, 1 banana"
             required
           ></textarea>
         </div>
 
         <div className="text-end">
-          <button type="submit" className="gen">Save Supplement</button>
+          <button type="submit" className="gen">Save Diet Meal</button>
         </div>
       </form>
-
-      <SupplementsFetch />
+      <ViewDietPlans />
     </div>
   );
 };
 
-export default Supplement;
+export default DietPlanForm;

@@ -8,7 +8,7 @@ import Members from './member/Members';
 import FeePackage from './FeePackage/FeePackage';
 import Notification from './Notification/Notification';
 import Supplement from './Supplements/Supplement';
-import DietDetails from './DietDetails';
+import DietDetails from './Diets/DietDetails';
 import './Admin.css';
 
 function Admin() {

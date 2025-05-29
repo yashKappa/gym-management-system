@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../Firebase';
 import ViewPackages from './ViewPackages';
@@ -8,7 +8,8 @@ const FeePackageForm = () => {
   const [features, setFeatures] = useState(['']);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+  const successRef = useRef(null);
+  const errorRef = useRef(null);
   const id = 'pack';
   
   const handleChange = (e) => {
@@ -50,17 +51,38 @@ const FeePackageForm = () => {
     }
   };
 
+  useEffect(() => {
+  if (successMessage && successRef.current) {
+    successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  if (errorMessage && errorRef.current) {
+    errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}, [successMessage, errorMessage]);
+
+
   return (
     <div className="container pt-4">
-      <h3 className="text-center mb-4">➕ Add Gym Fee Package</h3>
+      <h3 className="text-center mb-4">💰 Gym Fee Package</h3>
 
-      {successMessage && (
-        <div className="alert alert-success" role="alert">
-          {successMessage}
-        </div>
-      )}
-      {errorMessage && (
-        <div className="alert alert-danger" role="alert">
+{successMessage && (
+  <div
+    className="alert alert-success"
+    role="alert"
+    ref={successRef}
+    tabIndex={-1}
+  >
+    {successMessage}
+  </div>
+)}
+
+       {errorMessage && (
+        <div
+          className="alert alert-danger"
+          role="alert"
+          ref={errorRef}
+          tabIndex={-1}
+        >
           {errorMessage}
         </div>
       )}

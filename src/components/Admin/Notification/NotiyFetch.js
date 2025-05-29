@@ -75,9 +75,14 @@ const NotificationFetch = () => {
       )}
 
       {notifications.length === 0 ? (
-        <div className="text-center mt-4">
-          <p>No Notifications found.</p>
-        </div>
+         <div className="text-center mt-4">
+            <img
+              src={`${process.env.PUBLIC_URL}/assets/back.png`}
+              alt="No Receipts"
+              style={{ width: '10%', marginBottom: '10px', marginTop:'20px' }}
+            />
+            <p style={{ margin: 0 }}>No Notification found.</p>
+          </div>
       ) : (
         <div className="row g-4">
           {notifications.map((notification, idx) => (
