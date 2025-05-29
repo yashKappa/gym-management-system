@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { db } from '../../Firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 const ReceiptData = ({ memberName }) => {
   const [receipts, setReceipts] = useState([]);
@@ -8,28 +8,30 @@ const ReceiptData = ({ memberName }) => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const fetchReceipts = async () => {
-    if (!memberName) return;
+ const fetchReceipts = useCallback(async () => {
+  if (!memberName) return;
 
-    setLoading(true);
-    setError('');
-    try {
-      const receiptCollectionRef = collection(db, 'member', memberName, 'Receipt');
-      const snapshot = await getDocs(receiptCollectionRef);
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setReceipts(data);
-      setMessage('Receipt refreshed.');
-    } catch (err) {
-      setError('Failed to fetch receipts.');
-    } finally {
-      setLoading(false);
-      setTimeout(() => setMessage(''), 3000);
-    }
-  };
+  setLoading(true);
+  setError('');
+  try {
+    const receiptCollectionRef = collection(db, 'member', memberName, 'Receipt');
+    const q = query(receiptCollectionRef, orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setReceipts(data);
+    setMessage('Receipt refreshed.');
+  } catch (err) {
+    setError('Failed to fetch receipts.');
+  } finally {
+    setLoading(false);
+    setTimeout(() => setMessage(''), 3000);
+  }
+}, [memberName]);
 
-  useEffect(() => {
-    fetchReceipts();
-  }, [memberName]);
+useEffect(() => {
+  fetchReceipts();
+}, [fetchReceipts]);
+
 
   const formatDate = (timestamp) => {
     if (!timestamp?.toDate) return '-';

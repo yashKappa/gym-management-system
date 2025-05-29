@@ -35,7 +35,7 @@ const fetchPackages = async () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteDoc(doc(db, 'Details', id));
+await deleteDoc(doc(db, 'Details', 'pack', 'details', id));
       setPackages((prev) => prev.filter(pkg => pkg.id !== id));
       setMessage('Package deleted successfully.');
     } catch (error) {
