@@ -40,7 +40,7 @@ function Login() {
       className="d-flex align-items-center justify-content-center vh-100 bg-light"
       style={{ padding: '15px' }}
     >
-      <div className="card shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
+      <div className="border shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="mb-4 text-center fw-bold text-primary">Admin Login</h2>
         <form onSubmit={handleLogin}>
           <div className="mb-3">

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../Firebase';
 import ViewDietPlans from './ViewDietPlans';
+import VierDietChart from './DietPlansChart'
 
 const DietPlanForm = () => {
   const [formData, setFormData] = useState({
@@ -118,6 +119,7 @@ const DietPlanForm = () => {
         </div>
       </form>
       <ViewDietPlans />
+      <VierDietChart />
     </div>
   );
 };

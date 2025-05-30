@@ -28,24 +28,33 @@ const [activeSection, setActiveSection] = useState(
     }
   };
 
-  const renderSection = () => {
-    switch (activeSection) {
-      case 'Dashboard':
-        return <Dashboard />;
-      case 'Members':
-        return <Members />;
-      case 'Fee Package':
-        return <FeePackage />;
-      case 'Notification':
-        return <Notification />;
-      case 'Supplement':  
-        return <Supplement />;
-      case 'Diet Details':
-        return <DietDetails />;
-      default:
-        return <Dashboard />;
-    }
-  };
+ // Add this inside Admin component before renderSection()
+const handleSectionChange = (section) => {
+  setActiveSection(section);
+  localStorage.setItem('activeSection', section);
+  setSidebarOpen(false); // optionally close sidebar on mobile
+};
+
+// Pass handleSectionChange as prop to Dashboard
+const renderSection = () => {
+  switch (activeSection) {
+    case 'Dashboard':
+      return <Dashboard onSectionChange={handleSectionChange} />;
+    case 'Members':
+      return <Members />;
+    case 'Fee Package':
+      return <FeePackage />;
+    case 'Notification':
+      return <Notification />;
+    case 'Supplement':  
+      return <Supplement />;
+    case 'Diet Details':
+      return <DietDetails />;
+    default:
+      return <Dashboard onSectionChange={handleSectionChange} />;
+  }
+};
+
 
   const handleSectionClick = (section) => {
   setActiveSection(section);
