@@ -1,0 +1,27 @@
+.card{
+    width: 100%;
+    position: absolute;
+    display: flex;
+    top: 0%;
+    right: 0%;
+    z-index: 1;
+    min-height: 100vh;
+    border-radius: 0%;
+}
+
+.sub{
+    display: flex;
+    justify-content: center;
+}
+
+.gen{
+    background-color: rgb(255, 255, 255);
+    border: 1px solid black;
+    border-radius: 0.3rem;
+    padding: 5px 10px;
+    margin-top: 2rem;
+}
+
+.gen:hover{
+    background-color: rgb(180, 215, 247);
+}

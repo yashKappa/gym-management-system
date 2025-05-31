@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth, db } from '../Firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 
 function SignUp() {
@@ -9,15 +9,55 @@ function SignUp() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'danger'
+  const [maxAdmins, setMaxAdmins] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch max admin limit on component load
+    const fetchAdminLimit = async () => {
+      try {
+        const docRef = doc(db, 'Settings', 'adminLimit');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setMaxAdmins(docSnap.data().maxAdmins);
+        } else {
+          setMaxAdmins(3); // default limit if none set
+        }
+      } catch (error) {
+        console.error('Error fetching admin limit:', error);
+        setMessageType('danger');
+        setMessage('Failed to load admin limit. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdminLimit();
+  }, []);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
 
+    if (loading) return; // wait for admin limit fetch
+
     try {
+      // 1. Count current admin users
+      const adminsQuery = query(collection(db, 'Admin'), where('role', '==', 'admin'));
+      const adminsSnapshot = await getDocs(adminsQuery);
+      const currentAdminCount = adminsSnapshot.size;
+
+      if (currentAdminCount >= maxAdmins) {
+        setMessageType('danger');
+        setMessage(`Admin limit reached. Max allowed admins: ${maxAdmins}, Contact Previous Admin`);
+        return; // prevent signup
+      }
+
+      // 2. Proceed to create user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // 3. Save user to Firestore admin collection
       await setDoc(doc(db, 'Admin', user.uid), {
         email: user.email,
         uid: user.uid,
@@ -31,8 +71,13 @@ function SignUp() {
         navigate('/login');
       }, 1500);
     } catch (error) {
+      console.error(error);
       setMessageType('danger');
-      setMessage('User already exists. Use another email');
+      if (error.code === 'auth/email-already-in-use') {
+        setMessage('User already exists. Use another email');
+      } else {
+        setMessage('Failed to register admin. Please try again.');
+      }
     }
   };
 
@@ -43,48 +88,54 @@ function SignUp() {
     >
       <div className="border shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="mb-4 text-center fw-bold text-primary">Admin Sign Up</h2>
-        <form onSubmit={handleSignUp}>
-          <div className="mb-3">
-            <label htmlFor="emailInput" className="form-label">
-              Email address
-            </label>
-            <input
-              id="emailInput"
-              type="email"
-              className="form-control"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="passwordInput" className="form-label">
-              Password
-            </label>
-            <input
-              id="passwordInput"
-              type="password"
-              className="form-control"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-            />
-          </div>
 
-          {message && (
-            <div className={`alert alert-${messageType} mt-3`} role="alert">
-              {message}
+        {loading ? (
+          <p>Loading settings...</p>
+        ) : (
+          <form onSubmit={handleSignUp}>
+            <div className="mb-3">
+              <label htmlFor="emailInput" className="form-label">
+                Email address
+              </label>
+              <input
+                id="emailInput"
+                type="email"
+                className="form-control"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
             </div>
-          )}
+            <div className="mb-3">
+              <label htmlFor="passwordInput" className="form-label">
+                Password
+              </label>
+              <input
+                id="passwordInput"
+                type="password"
+                className="form-control"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="new-password"
+              />
+            </div>
 
-          <button type="submit" className="btn btn-primary w-100 mt-3 fw-semibold">
-            Sign Up
-          </button>
-        </form>
+            {message && (
+              <div className={`alert alert-${messageType} mt-3`} role="alert">
+                {message}
+              </div>
+            )}
+
+            <button type="submit" className="btn btn-primary w-100 mt-3 fw-semibold">
+              Sign Up
+            </button>
+          </form>
+        )}
+
         <p className="text-center mt-4 mb-0">
           Already have an account?{' '}
           <Link to="/login" className="text-decoration-none fw-semibold text-primary">

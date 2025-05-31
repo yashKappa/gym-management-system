@@ -1,0 +1,97 @@
+import React, { useEffect, useState } from 'react';
+import { auth } from '../Firebase';
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { useNavigate, Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
+
+
+function UserLogin() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Auto-login if user already authenticated
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        Cookies.set('user_session', user.uid, { expires: 7 }); // use a different cookie name for users
+        navigate('/user'); // redirect to user dashboard
+      } else {
+        setLoading(false); // show login form only if not logged in
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      Cookies.set('user_session', user.uid, { expires: 7 });
+      setErrorMsg('');
+      navigate('/user');
+    } catch (error) {
+      setErrorMsg('Invalid email or password. Try again');
+    }
+  };
+
+  if (loading) return <p>Checking session...</p>;
+
+  return (
+    <div className="d-flex align-items-center justify-content-center vh-100 bg-light" style={{ padding: '15px' }}>
+      <div className="border shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <h2 className="mb-4 text-center fw-bold text-primary">User Login</h2>
+        <form onSubmit={handleLogin}>
+          <div className="mb-3">
+            <label htmlFor="emailInput" className="form-label">Email address</label>
+            <input
+              id="emailInput"
+              type="email"
+              className="form-control"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="username"
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="passwordInput" className="form-label">Password</label>
+            <input
+              id="passwordInput"
+              type="password"
+              className="form-control"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+          </div>
+
+          {errorMsg && (
+            <div className="alert alert-danger mt-3" role="alert">
+              {errorMsg}
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary w-100 mt-3 fw-semibold">
+            Login
+          </button>
+        </form>
+        <p className="text-center mt-4 mb-0">
+          Don't have an account?{' '}
+          <Link to="/userSignup" className="text-decoration-none fw-semibold text-primary">
+            Sign up here
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default UserLogin;
