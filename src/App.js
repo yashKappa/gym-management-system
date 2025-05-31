@@ -1,6 +1,5 @@
-// App.js
 import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { auth } from './components/Firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Cookies from 'js-cookie';
@@ -8,6 +7,7 @@ import Cookies from 'js-cookie';
 import Login from './components/Login/Login';
 import SignUp from './components/Login/Signup';
 import Admin from './components/Admin/Admin';
+import Start from './components/Start';
 
 function App() {
   const navigate = useNavigate();
@@ -25,11 +25,11 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Start />} /> 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/admin" element={<Admin />} />
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="*" element={<Start />} />
     </Routes>
   );
 }

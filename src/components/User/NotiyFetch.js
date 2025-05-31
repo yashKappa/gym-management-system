@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../Firebase';
+import { collection, getDocs} from 'firebase/firestore';
+import { db } from '../Firebase';
 import { BsBellFill } from 'react-icons/bs';
 
 const alertClasses = ['alert-secondary', 'alert-primary', 'alert-success', 'alert-warning', 'alert-info'];
@@ -17,15 +17,6 @@ const NotificationFetch = () => {
     setTimeout(() => setMessage(''), 3000);
   };
 
-  const showDeleteMessage = (msg) => {
-    setMessage(msg);
-    setTimeout(() => {
-      if (messageRef.current) {
-        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-    setTimeout(() => setMessage(''), 3000);
-  };
 
   const fetchNotifications = async () => {
     try {
@@ -46,18 +37,6 @@ const NotificationFetch = () => {
     fetchNotifications();
   }, []);
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'Details', 'Notifications', 'details', id));
-      setNotifications(prev => prev.filter(notification => notification.id !== id));
-      showDeleteMessage('Notification deleted successfully.');
-    } catch (error) {
-      console.error('❌ Error deleting notification:', error);
-      showDeleteMessage('Failed to delete notification.');
-    } finally {
-      setConfirmId(null);
-    }
-  };
 
   return (
     <div className="container py-5">
@@ -94,27 +73,10 @@ const NotificationFetch = () => {
                 <hr />
                 <p>{notification.msg || 'No message content.'}</p>
                 <div className="d-flex justify-content-end">
-                  <button className="dels btn-outline-danger" onClick={() => setConfirmId(notification.id)}>
-                    Delete
-                  </button>
                 </div>
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {confirmId && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
-          <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>
-            <h5 className="mb-3">Confirm Deletion</h5>
-            <p>Are you sure you want to delete this notification?</p>
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmId)}>Yes, Delete</button>
-            </div>
-          </div>
         </div>
       )}
     </div>

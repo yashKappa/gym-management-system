@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { auth } from '../Firebase';
+import { auth } from './Firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
-import Dashboard from './Dashboard';
-import Members from './member/Members';
-import FeePackage from './FeePackage/FeePackage';
-import Notification from './Notification/Notification';
-import Supplement from './Supplements/Supplement';
-import DietDetails from './Diets/DietDetails';
-import './Admin.css';
+import Dashboard from './User/Dashboard';
+import ViewPackages from './User/ViewPackages';
+import NotificationFetch from './User/NotiyFetch';
+import SupplementsFetch from './User/SupplementsFetch';
+import ViewDietPlans from './Admin/Diets/ViewDietPlans';
+import './Admin/Admin.css';
 
 function Admin() {
   const navigate = useNavigate();
@@ -40,16 +39,14 @@ const renderSection = () => {
   switch (activeSection) {
     case 'Dashboard':
       return <Dashboard onSectionChange={handleSectionChange} />;
-    case 'Members':
-      return <Members />;
     case 'Fee Package':
-      return <FeePackage />;
+      return <ViewPackages />;
     case 'Notification':
-      return <Notification />;
+      return <NotificationFetch />;
     case 'Supplement':  
-      return <Supplement />;
+      return <SupplementsFetch />;
     case 'Diet Details':
-      return <DietDetails />;
+      return <ViewDietPlans />;
     default:
       return <Dashboard onSectionChange={handleSectionChange} />;
   }

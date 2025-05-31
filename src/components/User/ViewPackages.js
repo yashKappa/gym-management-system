@@ -1,6 +1,6 @@
   import React, { useEffect, useState, useRef } from 'react';
-  import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-  import { db } from '../../Firebase';
+  import { collection, getDocs} from 'firebase/firestore';
+  import { db } from '../Firebase';
 
   const alertClasses = ['alert-secondary', 'alert-primary', 'alert-success', 'alert-warning', 'alert-info'];
 
@@ -36,28 +36,6 @@
       fetchPackages();
     }, []);
 
-    const handleDelete = async (id) => {
-      try {
-        await deleteDoc(doc(db, 'Details', 'pack', 'details', id));
-        setPackages((prev) => prev.filter(pkg => pkg.id !== id));
-        setMessage('Package deleted successfully.');
-
-        setTimeout(() => {
-          if (messageRef.current) {
-            messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            messageRef.current.focus();
-          }
-        }, 100);
-
-        setTimeout(() => setMessage(''), 3000);
-      } catch (error) {
-        console.error('❌ Error deleting package:', error);
-        setMessage('Failed to delete package.');
-        setTimeout(() => setMessage(''), 3000);
-      } finally {
-        setConfirmId(null);
-      }
-    };
 
     return (
       <div className="container py-5">
@@ -107,30 +85,10 @@
                     </ul>
                   )}
                   <div className="d-flex justify-content-end">
-                    <button
-                      className="dels btn-outline-danger"
-                      onClick={() => setConfirmId(pkg.id)}
-                    >
-                      Delete
-                    </button>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
-        )}
-
-        {/* Delete Confirmation Modal */}
-        {confirmId && (
-          <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
-            <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>
-              <h5 className="mb-3">Confirm Deletion</h5>
-              <p>Are you sure you want to delete this package?</p>
-              <div className="d-flex justify-content-end">
-                <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
-                <button className="btn btn-danger" onClick={() => handleDelete(confirmId)}>Yes, Delete</button>
-              </div>
-            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../Firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../Firebase';
 import { FaDumbbell } from 'react-icons/fa';
 
 const alertClasses = [
@@ -47,30 +47,6 @@ const messageRef = useRef(null);
     fetchSupplements();
   }, []);
 
-const handleDelete = async (id) => {
-  try {
-    await deleteDoc(doc(db, 'Details', 'Supplements', 'details', id));
-    setSupplements(prev => prev.filter(s => s.id !== id));
-    setMessage('Supplement deleted successfully.');
-    setTimeout(() => {
-      if (messageRef.current) {
-        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-  } catch (error) {
-    console.error('❌ Error deleting supplement:', error);
-    setMessage('Failed to delete supplement.');
-    setTimeout(() => {
-      if (messageRef.current) {
-        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-  } finally {
-    setConfirmId(null);
-    setTimeout(() => setMessage(''), 3000);
-  }
-};
-
 
   return (
     <div className="container py-5">
@@ -113,12 +89,6 @@ const handleDelete = async (id) => {
                 />
                 <p>{supplement.description || 'No description available.'}</p>
                 <div className="d-flex justify-content-end">
-                  <button
-                    className="dels btn-outline-danger"
-                    onClick={() => setConfirmId(supplement.id)}
-                  >
-                    Delete
-                  </button>
                 </div>
               </div>
             </div>
@@ -126,19 +96,7 @@ const handleDelete = async (id) => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {confirmId && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
-          <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>
-            <h5 className="mb-3">Confirm Deletion</h5>
-            <p>Are you sure you want to delete this supplement?</p>
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmId)}>Yes, Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };

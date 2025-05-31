@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../Firebase';
+import { collection, getDocs} from 'firebase/firestore';
+import { db } from '../Firebase';
 
 const alertClasses = [
   'alert-success',
@@ -19,7 +19,6 @@ const ViewDietPlans = () => {
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
   const [activeTab, setActiveTab] = useState('beginner');
-  const [confirmId, setConfirmId] = useState(null);
   const mealOrder = ['breakfast', 'snack', 'lunch', 'snack2', 'dinner', 'post workout'];
   const normalize = (str) => str?.toLowerCase().replace(/\s+/g, '');
 
@@ -46,19 +45,6 @@ const ViewDietPlans = () => {
   useEffect(() => {
     fetchDietPlans();
   }, []);
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'Details', 'Diets', 'plans', id));
-      setDietPlans(prev => prev.filter(plan => plan.id !== id));
-      showMessage('Diet plan deleted successfully.');
-    } catch (error) {
-      console.error('❌ Error deleting diet plan:', error);
-      showMessage('Failed to delete diet plan.');
-    } finally {
-      setConfirmId(null);
-    }
-  };
 
 
   const filteredPlans = dietPlans
@@ -115,27 +101,10 @@ const ViewDietPlans = () => {
                 <hr />
                 <p>{plan.items}</p>
                 <div className="d-flex justify-content-end">
-                  <button className="dels btn-outline-danger" onClick={() => setConfirmId(plan.id)}>
-                    Delete
-                  </button>
                 </div>
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {confirmId && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
-          <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>
-            <h5 className="mb-3">Confirm Deletion</h5>
-            <p>Are you sure you want to delete this diet plan?</p>
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmId)}>Yes, Delete</button>
-            </div>
-          </div>
         </div>
       )}
     </div>
