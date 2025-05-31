@@ -7,7 +7,10 @@ import Cookies from 'js-cookie';
 import Login from './components/Login/Login';
 import SignUp from './components/Login/Signup';
 import Admin from './components/Admin/Admin';
-import Start from './components/Start';
+import Start from './components/User/Start';
+import UserLogin from './components/User-Login/UserLogin'; // ✅ Import this
+// If you have a separate AdminLogin component, import it. Otherwise use `Login`
+import AdminLogin from './components/Login/Login'; // ✅ Optional: Alias
 
 function App() {
   const navigate = useNavigate();
@@ -25,11 +28,13 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Start />} /> 
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Start />} />
+      <Route path="/user-login" element={<UserLogin />} />
+      <Route path="/login" element={<AdminLogin />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="*" element={<Start />} />
+      
     </Routes>
   );
 }

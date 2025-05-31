@@ -1,12 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import {
-  BsBellFill,
-  BsPeopleFill,
-  BsHeartPulseFill,
-  BsCapsule,
-  BsCoin,
-  BsGearFill
-} from 'react-icons/bs';
 import { db } from '../Firebase';  // make sure your Firebase config path is correct
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 

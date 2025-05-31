@@ -8,7 +8,6 @@ const alertClasses = ['alert-secondary', 'alert-primary', 'alert-success', 'aler
 const NotificationFetch = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
 

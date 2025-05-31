@@ -22,7 +22,7 @@ const [activeSection, setActiveSection] = useState(
     try {
       await signOut(auth);
       localStorage.removeItem('adminEmail');
-      navigate('/login');
+      navigate('/start');
     } catch (error) {
       alert("Logout failed: " + error.message);
     }

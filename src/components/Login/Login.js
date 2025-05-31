@@ -36,12 +36,12 @@ function Login() {
   };
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center vh-100 bg-light"
-      style={{ padding: '15px' }}
-    >
+    <div className="d-flex align-items-center justify-content-center vh-100 bg-light" style={{ padding: '15px' }} >
+        <button className="rec position-absolute top-0 start-0 m-3" onClick={() => navigate('/start')} >
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </button>
       <div className="border shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
-        <h2 className="mb-4 text-center fw-bold text-primary">Admin Login</h2>
+        <h2 className="mb-4 text-center">Admin Login</h2>
         <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label htmlFor="emailInput" className="form-label">
@@ -80,7 +80,7 @@ function Login() {
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary w-100 mt-3 fw-semibold">
+          <button type="submit" className="log w-100 mt-3 fw-semibold">
             Login
           </button>
         </form>

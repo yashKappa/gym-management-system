@@ -1,97 +1,96 @@
-import React, { useEffect, useState } from 'react';
-import { auth } from '../Firebase';
-import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { db } from '../Firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
-
 function UserLogin() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState('');
+  const [accessCode, setAccessCode] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Auto-login if user already authenticated
+  // Auto-login if cookies exist
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        Cookies.set('user_session', user.uid, { expires: 7 }); // use a different cookie name for users
-        navigate('/user'); // redirect to user dashboard
-      } else {
-        setLoading(false); // show login form only if not logged in
-      }
-    });
-    return () => unsubscribe();
+    const savedName = Cookies.get('memberName');
+    const savedAccessCode = Cookies.get('memberAccessCode');
+
+    if (savedName && savedAccessCode) {
+      navigate('/user/dashboard');
+    }
   }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+    setError('');
 
-      Cookies.set('user_session', user.uid, { expires: 7 });
-      setErrorMsg('');
-      navigate('/user');
-    } catch (error) {
-      setErrorMsg('Invalid email or password. Try again');
+    try {
+      const docRef = doc(db, 'member', name.trim());
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.name === name.trim() && data.accessCode === accessCode.trim()) {
+          // Save persistent login in cookies (expires in 7 days)
+          Cookies.set('memberName', data.name, { expires: 7 });
+          Cookies.set('memberAccessCode', data.accessCode, { expires: 7 });
+          navigate('/user/dashboard');
+        } else {
+          setError('Name or Access Code is incorrect.');
+        }
+      } else {
+        setError('Member not found.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('An error occurred during login.');
     }
   };
 
-  if (loading) return <p>Checking session...</p>;
+ return (
+  <div className="d-flex align-items-center justify-content-center vh-100 bg-light position-relative">
 
-  return (
-    <div className="d-flex align-items-center justify-content-center vh-100 bg-light" style={{ padding: '15px' }}>
-      <div className="border shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
-        <h2 className="mb-4 text-center fw-bold text-primary">User Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="mb-3">
-            <label htmlFor="emailInput" className="form-label">Email address</label>
-            <input
-              id="emailInput"
-              type="email"
-              className="form-control"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="username"
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="passwordInput" className="form-label">Password</label>
-            <input
-              id="passwordInput"
-              type="password"
-              className="form-control"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-            />
-          </div>
+    {/* Back Button in Top-Left Corner */}
+ <button className="rec position-absolute top-0 start-0 m-3" onClick={() => navigate('/start')} >
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </button>
+    
+    <div className="p-4 shadow border" style={{ width: '100%', maxWidth: '400px' }}>
+      <h3 className="text-center mb-4">Member Login</h3>
+      <form onSubmit={handleLogin}>
+        <div className="mb-3">
+          <label className="form-label">Name</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
 
-          {errorMsg && (
-            <div className="alert alert-danger mt-3" role="alert">
-              {errorMsg}
-            </div>
-          )}
+        <div className="mb-3">
+          <label className="form-label">Access Code</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter access code"
+            value={accessCode}
+            onChange={(e) => setAccessCode(e.target.value)}
+            required
+          />
+        </div>
 
-          <button type="submit" className="btn btn-primary w-100 mt-3 fw-semibold">
-            Login
-          </button>
-        </form>
-        <p className="text-center mt-4 mb-0">
-          Don't have an account?{' '}
-          <Link to="/userSignup" className="text-decoration-none fw-semibold text-primary">
-            Sign up here
-          </Link>
-        </p>
-      </div>
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        <button className="log w-100 mt-3" type="submit">
+          Login
+        </button>
+      </form>
     </div>
-  );
+  </div>
+);
 }
 
 export default UserLogin;

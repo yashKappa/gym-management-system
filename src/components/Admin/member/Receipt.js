@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../../Firebase'; 
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import './Receipt.css';
 import ReceiptData from './ReceiptData';
 
 const Receipt = ({ member, onClose }) => {

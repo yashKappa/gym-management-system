@@ -23,9 +23,8 @@ const alertClasses = [
 const SupplementsFetch = () => {
   const [supplements, setSupplements] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
-const messageRef = useRef(null);
+  const messageRef = useRef(null);
 
   const fetchSupplements = async () => {
     try {

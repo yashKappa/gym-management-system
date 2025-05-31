@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './Members.css';
+import '../../style.css';
 import { db } from '../../Firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 

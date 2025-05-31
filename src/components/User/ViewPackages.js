@@ -7,7 +7,6 @@
   const ViewPackages = () => {
     const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [confirmId, setConfirmId] = useState(null);
     const [message, setMessage] = useState('');
     const messageRef = useRef(null);
 
