@@ -11,7 +11,7 @@ const MemFetch = () => {
   const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
   const [selectedMember, setSelectedMember] = useState(null);
-const messageRef = useRef(null);
+  const messageRef = useRef(null);
 
   useEffect(() => {
     fetchMembers();
@@ -33,43 +33,42 @@ const messageRef = useRef(null);
   };
 
   const deleteMember = async (id) => {
-  const subcollections = ['Receipt', 'Attendance']; // Add all subcollection names here
+    const subcollections = ['Receipt', 'Attendance'];
 
-  try {
-    // Step 1: Delete all documents in each subcollection
-    for (const sub of subcollections) {
-      const subColRef = collection(db, 'member', id, sub);
-      const subSnap = await getDocs(subColRef);
-      const deletePromises = subSnap.docs.map(docSnap =>
-        deleteDoc(doc(db, 'member', id, sub, docSnap.id))
-      );
-      await Promise.all(deletePromises);
+    try {
+      // Step 1: Delete all documents in each subcollection
+      for (const sub of subcollections) {
+        const subColRef = collection(db, 'member', id, sub);
+        const subSnap = await getDocs(subColRef);
+        const deletePromises = subSnap.docs.map(docSnap =>
+          deleteDoc(doc(db, 'member', id, sub, docSnap.id))
+        );
+        await Promise.all(deletePromises);
+      }
+
+      // Step 2: Delete the parent member document
+      await deleteDoc(doc(db, 'member', id));
+
+      setMembers(prev => prev.filter(m => m.id !== id));
+      setMessage('Member and all associated data deleted successfully.');
+      setTimeout(() => {
+        if (messageRef.current) {
+          messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } catch (error) {
+      setMessage('Failed to delete member and their data.');
+      setTimeout(() => {
+        if (messageRef.current) {
+          messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      console.error('Deletion error:', error);
+    } finally {
+      setConfirmId(null);
+      setTimeout(() => setMessage(''), 3000);
     }
-
-    // Step 2: Delete the parent member document
-    await deleteDoc(doc(db, 'member', id));
-
-    // Step 3: Update local state
-    setMembers(prev => prev.filter(m => m.id !== id));
-setMessage('Member and all associated data deleted successfully.');
-setTimeout(() => {
-  if (messageRef.current) {
-    messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}, 100);
-  } catch (error) {
-setMessage('Failed to delete member and their data.');
-setTimeout(() => {
-  if (messageRef.current) {
-    messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}, 100);
-    console.error('Deletion error:', error);
-  } finally {
-    setConfirmId(null);
-    setTimeout(() => setMessage(''), 3000);
-  }
-};
+  };
 
 
   const filtered = members.filter(member =>
@@ -87,11 +86,11 @@ setTimeout(() => {
         </button>
       </div>
 
-{message && (
-  <div ref={messageRef} className="alert alert-info">
-    {message}
-  </div>
-)}
+      {message && (
+        <div ref={messageRef} className="alert alert-info">
+          {message}
+        </div>
+      )}
 
       <input
         type="text"
@@ -138,7 +137,7 @@ setTimeout(() => {
                   <td>{m.accessCode}</td>
                   <td>
                     <button className='rec' onClick={() => setSelectedMember(m)}>Receipt</button>
-                  </td>                 
+                  </td>
                   <td className='del'>
                     <button onClick={() => setConfirmId(m.id)}><i class="fa-solid fa-trash"></i></button>
                   </td>
@@ -155,7 +154,6 @@ setTimeout(() => {
         )}
       </div>
 
-      {/* Simple Delete Confirmation */}
       {confirmId && (
         <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
           <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>

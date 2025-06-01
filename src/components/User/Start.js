@@ -8,8 +8,9 @@ import Dashboard from './Dashboard';
 import ViewPackages from './ViewPackages';
 import NotificationFetch from './NotiyFetch';
 import SupplementsFetch from './SupplementsFetch';
-import ViewDietPlans from '../Admin/Diets/ViewDietPlans';
+import ViewDietPlans from './ViewDietPlans';
 import '../Admin/Admin.css';
+import UserData from './UserData';
 
 function Admin() {
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ function Admin() {
     switch (activeSection) {
       case 'Dashboard':
         return <Dashboard onSectionChange={handleSectionChange} />;
+      case 'User Data':
+        return <UserData />
       case 'Fee Package':
         return <ViewPackages />;
       case 'Notification':
@@ -61,19 +64,18 @@ function Admin() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); // try sign out admin
+      await signOut(auth);
     } catch (error) {
       console.warn("Admin was not signed in via Firebase:", error.message);
     }
 
-    // Clear cookies
     Cookies.remove('memberName');
     Cookies.remove('memberAccessCode');
     Cookies.remove('adminEmail');
 
     setIsAdminLoggedIn(false);
     setIsMemberLoggedIn(false);
-    navigate('/start');
+    navigate('/Dashboard', { replace: true });
   };
 
   return (
@@ -98,7 +100,7 @@ function Admin() {
 
         {[
           { label: 'Dashboard', icon: 'fa-chart-simple' },
-          { label: 'Members', icon: 'fa-users' },
+          { label: 'User Data', icon: 'fa-users' },
           { label: 'Fee Package', icon: 'fa-sack-dollar' },
           { label: 'Notification', icon: 'fa-bell' },
           { label: 'Supplement', icon: 'fa-capsules' },
@@ -122,10 +124,10 @@ function Admin() {
             </button>
           ) : (
             <>
-              <button className="btn btn-primary w-100 mb-2" onClick={() => navigate('/user-login')}>
+              <button className="gen w-100 mb-2" onClick={() => navigate('/user-login')}>
                 👤 User Login
               </button>
-              <button className="btn btn-secondary w-100" onClick={() => navigate('/login')}>
+              <button className="gen w-100" onClick={() => navigate('/login')}>
                 🔐 Admin Login
               </button>
             </>
@@ -133,7 +135,6 @@ function Admin() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-grow-1 bg-light">
         <nav className="navbar navbar-light px-3 justify-content-between align-items-center p-2">
           <img

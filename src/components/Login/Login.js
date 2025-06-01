@@ -10,7 +10,6 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
-  // Auto-login if user already authenticated
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -37,9 +36,9 @@ function Login() {
 
   return (
     <div className="d-flex align-items-center justify-content-center vh-100 bg-light" style={{ padding: '15px' }} >
-        <button className="rec position-absolute top-0 start-0 m-3" onClick={() => navigate('/start')} >
-      <i class="fa-solid fa-arrow-left"></i> Back
-    </button>
+      <button className="rec position-absolute top-0 start-0 m-3" onClick={() => navigate('/start')} >
+        <i class="fa-solid fa-arrow-left"></i> Back
+      </button>
       <div className="border shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="mb-4 text-center">Admin Login</h2>
         <form onSubmit={handleLogin}>

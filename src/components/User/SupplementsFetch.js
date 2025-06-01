@@ -13,11 +13,11 @@ const alertClasses = [
   'alert-dark',
   'alert-light',
   'alert-themed-blue',
-  'alert-neutral',      
-  'alert-highlight',      
-  'alert-urgent',        
-  'alert-muted',         
-  'alert-glow'      
+  'alert-neutral',
+  'alert-highlight',
+  'alert-urgent',
+  'alert-muted',
+  'alert-glow'
 ];
 
 const SupplementsFetch = () => {
@@ -49,28 +49,28 @@ const SupplementsFetch = () => {
 
   return (
     <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
         <h3>💪 Supplements</h3>
         <button className="rec" onClick={fetchSupplements} disabled={loading}>
           <i className="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 
-{message && (
-  <div ref={messageRef} className="alert alert-info">
-    {message}
-  </div>
-)}
+      {message && (
+        <div ref={messageRef} className="alert alert-info">
+          {message}
+        </div>
+      )}
 
       {supplements.length === 0 ? (
-         <div className="text-center mt-4">
-            <img
-              src={`${process.env.PUBLIC_URL}/assets/back.png`}
-              alt="No Receipts"
-              style={{ width: '10%', marginBottom: '10px', marginTop:'20px' }}
-            />
-            <p style={{ margin: 0 }}>No Supplements found.</p>
-          </div>
+        <div className="text-center mt-4">
+          <img
+            src={`${process.env.PUBLIC_URL}/assets/back.png`}
+            alt="No Receipts"
+            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
+          />
+          <p style={{ margin: 0 }}>No Supplements found.</p>
+        </div>
       ) : (
         <div className="row g-4">
           {supplements.map((supplement, idx) => (
@@ -84,7 +84,7 @@ const SupplementsFetch = () => {
                   src={supplement.image || '/default.jpg'}
                   alt={supplement.name}
                   className="img-fluid rounded mb-2"
-                  style={{ maxHeight: '200px', objectFit: 'cover' }}
+                  style={{ maxHeight: '150px', objectFit: 'cover' }}
                 />
                 <p>{supplement.description || 'No description available.'}</p>
                 <div className="d-flex justify-content-end">
@@ -95,7 +95,7 @@ const SupplementsFetch = () => {
         </div>
       )}
 
-      
+
     </div>
   );
 };

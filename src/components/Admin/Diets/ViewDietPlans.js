@@ -11,6 +11,12 @@ const alertClasses = [
   'alert-danger',
   'alert-dark',
   'alert-light',
+  'alert-themed-blue',
+  'alert-neutral',
+  'alert-highlight',
+  'alert-urgent',
+  'alert-muted',
+  'alert-glow'
 ];
 
 const ViewDietPlans = () => {
@@ -62,12 +68,12 @@ const ViewDietPlans = () => {
 
 
   const filteredPlans = dietPlans
-  .filter(plan => plan.level?.toLowerCase() === activeTab)
-  .sort((a, b) => {
-    const indexA = mealOrder.indexOf(normalize(a.mealType));
-    const indexB = mealOrder.indexOf(normalize(b.mealType));
-    return indexA - indexB;
-  });
+    .filter(plan => plan.level?.toLowerCase() === activeTab)
+    .sort((a, b) => {
+      const indexA = mealOrder.indexOf(normalize(a.mealType));
+      const indexB = mealOrder.indexOf(normalize(b.mealType));
+      return indexA - indexB;
+    });
 
   return (
     <div className="container py-5">

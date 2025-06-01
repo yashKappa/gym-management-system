@@ -11,7 +11,7 @@ const FeePackageForm = () => {
   const successRef = useRef(null);
   const errorRef = useRef(null);
   const id = 'pack';
-  
+
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -52,31 +52,31 @@ const FeePackageForm = () => {
   };
 
   useEffect(() => {
-  if (successMessage && successRef.current) {
-    successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  if (errorMessage && errorRef.current) {
-    errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}, [successMessage, errorMessage]);
+    if (successMessage && successRef.current) {
+      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (errorMessage && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [successMessage, errorMessage]);
 
 
   return (
     <div className="container pt-4">
       <h3 className="text-center mb-4">💰 Gym Fee Package</h3>
 
-{successMessage && (
-  <div
-    className="alert alert-success"
-    role="alert"
-    ref={successRef}
-    tabIndex={-1}
-  >
-    {successMessage}
-  </div>
-)}
+      {successMessage && (
+        <div
+          className="alert alert-success"
+          role="alert"
+          ref={successRef}
+          tabIndex={-1}
+        >
+          {successMessage}
+        </div>
+      )}
 
-       {errorMessage && (
+      {errorMessage && (
         <div
           className="alert alert-danger"
           role="alert"

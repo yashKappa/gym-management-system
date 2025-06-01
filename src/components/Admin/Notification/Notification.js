@@ -7,10 +7,8 @@ const Notification = () => {
   const [formData, setFormData] = useState({ title: '', msg: '' });
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
   const successRef = useRef(null);
   const errorRef = useRef(null);
-
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };

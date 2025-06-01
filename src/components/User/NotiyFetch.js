@@ -1,9 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs} from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../Firebase';
 import { BsBellFill } from 'react-icons/bs';
 
-const alertClasses = ['alert-secondary', 'alert-primary', 'alert-success', 'alert-warning', 'alert-info'];
+const alertClasses = [
+  'alert-success',
+  'alert-info',
+  'alert-warning',
+  'alert-primary',
+  'alert-secondary',
+  'alert-danger',
+  'alert-dark',
+  'alert-light',
+  'alert-themed-blue',
+  'alert-neutral',
+  'alert-highlight',
+  'alert-urgent',
+  'alert-muted',
+  'alert-glow'
+];
 
 const NotificationFetch = () => {
   const [notifications, setNotifications] = useState([]);
@@ -53,14 +68,14 @@ const NotificationFetch = () => {
       )}
 
       {notifications.length === 0 ? (
-         <div className="text-center mt-4">
-            <img
-              src={`${process.env.PUBLIC_URL}/assets/back.png`}
-              alt="No Receipts"
-              style={{ width: '10%', marginBottom: '10px', marginTop:'20px' }}
-            />
-            <p style={{ margin: 0 }}>No Notification found.</p>
-          </div>
+        <div className="text-center mt-4">
+          <img
+            src={`${process.env.PUBLIC_URL}/assets/back.png`}
+            alt="No Receipts"
+            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
+          />
+          <p style={{ margin: 0 }}>No Notification found.</p>
+        </div>
       ) : (
         <div className="row g-4">
           {notifications.map((notification, idx) => (

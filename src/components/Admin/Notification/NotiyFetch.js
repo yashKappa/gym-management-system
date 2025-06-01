@@ -75,14 +75,14 @@ const NotificationFetch = () => {
       )}
 
       {notifications.length === 0 ? (
-         <div className="text-center mt-4">
-            <img
-              src={`${process.env.PUBLIC_URL}/assets/back.png`}
-              alt="No Receipts"
-              style={{ width: '10%', marginBottom: '10px', marginTop:'20px' }}
-            />
-            <p style={{ margin: 0 }}>No Notification found.</p>
-          </div>
+        <div className="text-center mt-4">
+          <img
+            src={`${process.env.PUBLIC_URL}/assets/back.png`}
+            alt="No Receipts"
+            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
+          />
+          <p style={{ margin: 0 }}>No Notification found.</p>
+        </div>
       ) : (
         <div className="row g-4">
           {notifications.map((notification, idx) => (
@@ -104,7 +104,6 @@ const NotificationFetch = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {confirmId && (
         <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
           <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>

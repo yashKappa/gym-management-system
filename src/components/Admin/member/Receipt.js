@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { db } from '../../Firebase'; 
+import { db } from '../../Firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import ReceiptData from './ReceiptData';
 
@@ -12,18 +12,14 @@ const Receipt = ({ member, onClose }) => {
   const [message, setMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Ref for message div
   const messageRef = useRef(null);
 
-  // Effect to focus the message when it appears
- useEffect(() => {
-  if ((message || errorMessage) && messageRef.current) {
-    messageRef.current.focus();
-    messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}, [message, errorMessage]);
-
+  useEffect(() => {
+    if ((message || errorMessage) && messageRef.current) {
+      messageRef.current.focus();
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [message, errorMessage]);
 
 
   if (!member) return null;
@@ -82,11 +78,11 @@ const Receipt = ({ member, onClose }) => {
 
       {(message || errorMessage) && (
         <div
-          tabIndex={-1}               // Make div focusable
-          ref={messageRef}            // Attach ref
+          tabIndex={-1}
+          ref={messageRef}
           className={`alert mt-3 ${message ? 'alert-success' : 'alert-danger'}`}
-          aria-live="assertive"       // Announce immediately for screen readers
-          role="alert"                // Role alert for screen readers
+          aria-live="assertive"
+          role="alert"
         >
           {message || errorMessage}
         </div>

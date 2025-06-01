@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../Firebase';  // make sure your Firebase config path is correct
+import { db } from '../Firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const dashboardItems = [
@@ -40,7 +40,6 @@ const Dashboard = ({ onSectionChange }) => {
   const [loadingLimit, setLoadingLimit] = useState(true);
   const [message, setMessage] = useState('');
 
-  // Fetch current admin limit from Firestore on mount
   useEffect(() => {
     const fetchAdminLimit = async () => {
       try {
@@ -49,7 +48,7 @@ const Dashboard = ({ onSectionChange }) => {
         if (docSnap.exists()) {
           setMaxAdmins(docSnap.data().maxAdmins);
         } else {
-          setMaxAdmins(3); // default if none set
+          setMaxAdmins(3);
         }
       } catch (error) {
         console.error('Error fetching admin limit:', error);
@@ -102,7 +101,7 @@ const Dashboard = ({ onSectionChange }) => {
         ))}
       </div>
 
-       {/* Admin Settings Section */}
+
       <div className="mb-5 p-4 border rounded shadow-sm bg-light">
         <h4 className="mb-3 d-flex align-items-center gap-2">
           ⚙️ Admin Settings
@@ -122,7 +121,7 @@ const Dashboard = ({ onSectionChange }) => {
                 min="1"
                 value={maxAdmins}
                 onChange={(e) => setMaxAdmins(parseInt(e.target.value) || 1)}
-                 style={{ maxWidth: '300px' }}
+                style={{ maxWidth: '300px' }}
               />
               <button className="gen mt-3" onClick={handleSaveLimit}>
                 Save Limit

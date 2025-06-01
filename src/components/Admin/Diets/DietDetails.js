@@ -21,7 +21,7 @@ const DietPlanForm = () => {
       successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     if (errorMessage && errorRef.current) {
-      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center'  });
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [successMessage, errorMessage]);
 

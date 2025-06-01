@@ -4,14 +4,12 @@ import { auth } from './components/Firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Cookies from 'js-cookie';
 
-import Login from './components/Login/Login';
 import SignUp from './components/Login/Signup';
 import Admin from './components/Admin/Admin';
 import Start from './components/User/Start';
-import UserLogin from './components/User-Login/UserLogin'; // ✅ Import this
-// If you have a separate AdminLogin component, import it. Otherwise use `Login`
-import AdminLogin from './components/Login/Login'; // ✅ Optional: Alias
-
+import UserLogin from './components/User-Login/UserLogin';
+import AdminLogin from './components/Login/Login';
+import Dashboard from './components/User/Dashboard';
 function App() {
   const navigate = useNavigate();
 
@@ -34,7 +32,7 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="*" element={<Start />} />
-      
+
     </Routes>
   );
 }

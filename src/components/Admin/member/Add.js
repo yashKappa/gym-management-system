@@ -130,16 +130,16 @@ const Add = () => {
                 <option value="None">None</option>
                 <option value="Personal Trainer">Personal Trainer</option>
               </select>
-               {errorMessage && (
-        <div
-          className="alert alert-danger"
-          role="alert"
-          ref={errorRef}
-          tabIndex={-1}
-        >
-          {errorMessage}
-        </div>
-      )}
+              {errorMessage && (
+                <div
+                  className="alert alert-danger"
+                  role="alert"
+                  ref={errorRef}
+                  tabIndex={-1}
+                >
+                  {errorMessage}
+                </div>
+              )}
               <div className="form-buttons">
                 <button type="submit" className="submit-btn">Submit</button>
                 <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>

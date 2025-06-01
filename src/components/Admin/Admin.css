@@ -1,18 +1,15 @@
-/* Sidebar base styles */
-
-
 .sidebar {
-  width: 250px;
+  min-width: 250px;
   transition: transform 0.3s ease;
   z-index: 1;
 }
-  
+
 .navbar {
   position: fixed;
   top: 0;
   width: 100%;
   right: 0;
-  height: 56px; /* adjust as needed */
+  height: 56px;
   background-color: #343a40;
   display: flex;
   align-items: center;
@@ -20,32 +17,32 @@
 }
 
 .flex-grow-1 {
-  margin-top: 56px; /* leave space for navbar */
+  margin-top: 56px;
   height: calc(100vh - 56px);
-  overflow-y: auto; /* enable scroll for main content only */
+  overflow-y: auto;
   background-color: #f8f9fa;
 }
 
-.logout{
-    background-color: aliceblue;
-    padding: 2px 5px;
-    font-weight: 500;
+.logout {
+  background-color: aliceblue;
+  padding: 2px 5px;
+  font-weight: 500;
 }
 
-.logout:hover{
-    background-color: rgb(248, 81, 81);
-    color: white;
-    font-weight: 500;
+.logout:hover {
+  background-color: rgb(248, 81, 81);
+  color: white;
+  font-weight: 500;
 }
 
 .menu {
   background-color: white !important;
-  color: black !important;  
-  border-color: black !important; 
+  color: black !important;
+  border-color: black !important;
 }
 
-.m-log{
-    width: 100%;
+.m-log {
+  width: 100%;
 }
 
 .sidebar-item:hover {
@@ -53,11 +50,10 @@
   color: white;
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   display: none;
 }
 
-/* Desktop: sidebar static on left */
 @media (min-width: 768px) {
   .sidebar {
     position: relative;
@@ -66,21 +62,19 @@
 
 }
 
-/* Mobile: sidebar fixed to right, initially hidden */
 @media (max-width: 767.98px) {
   .sidebar {
     position: fixed;
     top: 0;
-    right: 0;             /* Position from right */
+    right: 0;
     height: 100vh;
     background-color: #343a40;
-    z-index: 1050;        /* higher than other content */
-    transform: translateX(100%); /* Hide off screen right */
+    z-index: 1050;
+    transform: translateX(100%);
   }
 
-  /* When sidebar is open */
   .sidebar.show {
-    transform: translateX(0);  /* Slide in */
+    transform: translateX(0);
   }
 
 }

@@ -13,11 +13,11 @@ const alertClasses = [
   'alert-dark',
   'alert-light',
   'alert-themed-blue',
-  'alert-neutral',      
-  'alert-highlight',      
-  'alert-urgent',        
-  'alert-muted',         
-  'alert-glow'      
+  'alert-neutral',
+  'alert-highlight',
+  'alert-urgent',
+  'alert-muted',
+  'alert-glow'
 ];
 
 const SupplementsFetch = () => {
@@ -25,7 +25,7 @@ const SupplementsFetch = () => {
   const [loading, setLoading] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
-const messageRef = useRef(null);
+  const messageRef = useRef(null);
 
   const fetchSupplements = async () => {
     try {
@@ -47,29 +47,29 @@ const messageRef = useRef(null);
     fetchSupplements();
   }, []);
 
-const handleDelete = async (id) => {
-  try {
-    await deleteDoc(doc(db, 'Details', 'Supplements', 'details', id));
-    setSupplements(prev => prev.filter(s => s.id !== id));
-    setMessage('Supplement deleted successfully.');
-    setTimeout(() => {
-      if (messageRef.current) {
-        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-  } catch (error) {
-    console.error('❌ Error deleting supplement:', error);
-    setMessage('Failed to delete supplement.');
-    setTimeout(() => {
-      if (messageRef.current) {
-        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-  } finally {
-    setConfirmId(null);
-    setTimeout(() => setMessage(''), 3000);
-  }
-};
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'Details', 'Supplements', 'details', id));
+      setSupplements(prev => prev.filter(s => s.id !== id));
+      setMessage('Supplement deleted successfully.');
+      setTimeout(() => {
+        if (messageRef.current) {
+          messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } catch (error) {
+      console.error('❌ Error deleting supplement:', error);
+      setMessage('Failed to delete supplement.');
+      setTimeout(() => {
+        if (messageRef.current) {
+          messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } finally {
+      setConfirmId(null);
+      setTimeout(() => setMessage(''), 3000);
+    }
+  };
 
 
   return (
@@ -81,21 +81,21 @@ const handleDelete = async (id) => {
         </button>
       </div>
 
-{message && (
-  <div ref={messageRef} className="alert alert-info">
-    {message}
-  </div>
-)}
+      {message && (
+        <div ref={messageRef} className="alert alert-info">
+          {message}
+        </div>
+      )}
 
       {supplements.length === 0 ? (
-         <div className="text-center mt-4">
-            <img
-              src={`${process.env.PUBLIC_URL}/assets/back.png`}
-              alt="No Receipts"
-              style={{ width: '10%', marginBottom: '10px', marginTop:'20px' }}
-            />
-            <p style={{ margin: 0 }}>No Supplements found.</p>
-          </div>
+        <div className="text-center mt-4">
+          <img
+            src={`${process.env.PUBLIC_URL}/assets/back.png`}
+            alt="No Receipts"
+            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
+          />
+          <p style={{ margin: 0 }}>No Supplements found.</p>
+        </div>
       ) : (
         <div className="row g-4">
           {supplements.map((supplement, idx) => (
@@ -126,7 +126,6 @@ const handleDelete = async (id) => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {confirmId && (
         <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
           <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>

@@ -8,13 +8,12 @@ function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState(''); // 'success' or 'danger'
+  const [messageType, setMessageType] = useState('');
   const [maxAdmins, setMaxAdmins] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch max admin limit on component load
     const fetchAdminLimit = async () => {
       try {
         const docRef = doc(db, 'Settings', 'adminLimit');
@@ -22,7 +21,7 @@ function SignUp() {
         if (docSnap.exists()) {
           setMaxAdmins(docSnap.data().maxAdmins);
         } else {
-          setMaxAdmins(3); // default limit if none set
+          setMaxAdmins(3);
         }
       } catch (error) {
         console.error('Error fetching admin limit:', error);
@@ -39,10 +38,10 @@ function SignUp() {
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    if (loading) return; // wait for admin limit fetch
+    if (loading) return;
 
     try {
-      // 1. Count current admin users
+
       const adminsQuery = query(collection(db, 'Admin'), where('role', '==', 'admin'));
       const adminsSnapshot = await getDocs(adminsQuery);
       const currentAdminCount = adminsSnapshot.size;
@@ -50,14 +49,12 @@ function SignUp() {
       if (currentAdminCount >= maxAdmins) {
         setMessageType('danger');
         setMessage(`Admin limit reached. Max allowed admins: ${maxAdmins}, Contact Previous Admin`);
-        return; // prevent signup
+        return;
       }
 
-      // 2. Proceed to create user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 3. Save user to Firestore admin collection
       await setDoc(doc(db, 'Admin', user.uid), {
         email: user.email,
         uid: user.uid,
@@ -83,10 +80,10 @@ function SignUp() {
 
   return (
     <div className="d-flex align-items-center justify-content-center vh-100 bg-light" style={{ padding: '15px' }} >
-       <button className="rec position-absolute top-0 start-0 m-3" onClick={() => navigate('/start')} >
-      <i class="fa-solid fa-arrow-left"></i> Back
-    </button>
-    
+      <button className="rec position-absolute top-0 start-0 m-3" onClick={() => navigate('/start')} >
+        <i class="fa-solid fa-arrow-left"></i> Back
+      </button>
+
       <div className="border shadow-sm p-4" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="mb-4 text-center">Admin Sign Up</h2>
 

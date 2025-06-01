@@ -33,12 +33,11 @@
   color: white;
 }
 
-.add-btn i{
-    font-weight: bolder !important;
-    font-size: larger;
+.add-btn i {
+  font-weight: bolder !important;
+  font-size: larger;
 }
 
-/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -124,40 +123,47 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
-input:focus{
-    box-shadow: none !important;
-    border: 1px solid rgb(134, 134, 134) !important;
+input:focus {
+  box-shadow: none !important;
+  border: 1px solid rgb(134, 134, 134) !important;
 }
 
 @media (max-width: 766px) {
-    .container{
-        min-width: 100%;
-    }
+  .container {
+    min-width: 100%;
+  }
 }
 
-.del{
+.del {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 
-.del button{
+.del button {
   border: none;
   background-color: rgba(255, 255, 255, 0);
   transition: 0.2s;
 }
 
-.del button:hover{
-    color: red;
+.del button:hover {
+  color: red;
 }
 
-.confirm button{
+.confirm button {
   padding: 4px 8px;
 }
 
@@ -170,19 +176,19 @@ input:focus{
   font-weight: 600;
 }
 
-.rec{
+.rec {
   background-color: white;
   border: 1px solid black;
   border-radius: 0.3rem;
   transition: 0.2s;
 }
 
-.rec:hover{
+.rec:hover {
   background-color: #414141;
   color: white;
 }
 
-.dels{
+.dels {
   background-color: white;
   color: black;
   border: 1px solid black;
@@ -190,17 +196,17 @@ input:focus{
   transition: 0.2s;
 }
 
-.dels:hover{
+.dels:hover {
   background-color: #ff273c;
   color: white;
 }
 
-textarea{
+textarea {
   height: 30vh !important;
   resize: none;
 }
 
-textarea:focus{
+textarea:focus {
   box-shadow: none !important;
   border-color: #7e7e7e !important;
 }
@@ -242,57 +248,57 @@ textarea:focus{
   box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
 }
 
-.Diet button{
+.Diet button {
   color: black;
 }
 
-.Diet button:hover{
+.Diet button:hover {
   color: black;
   background-color: rgb(238, 238, 238);
 }
 
-.Diet .active{
+.Diet .active {
   background-color: #414141 !important;
   color: white !important;
   font-weight: 500;
 }
 
-.log{
-    border: none;
-    background-color: rgb(0, 89, 255);
-    padding: 5px 10px;
-    border-radius: 0.3rem;
-    color: white;
-    transition: 0.2s;
+.log {
+  border: none;
+  background-color: rgb(0, 89, 255);
+  padding: 5px 10px;
+  border-radius: 0.3rem;
+  color: white;
+  transition: 0.2s;
 }
 
-.log:hover{
-    background-color: rgb(3, 50, 136);
+.log:hover {
+  background-color: rgb(3, 50, 136);
 }
 
-.card{
-    width: 100%;
-    position: absolute;
-    display: flex;
-    top: 0%;
-    right: 0%;
-    z-index: 1;
-    min-height: 100vh;
-    border-radius: 0%;
+.card {
+  width: 100%;
+  position: absolute;
+  display: flex;
+  top: 0%;
+  right: 0%;
+  z-index: 1;
+  min-height: 100vh;
+  border-radius: 0%;
 }
 
-.sub{
-    display: flex;
-    justify-content: center;
+.sub {
+  display: flex;
+  justify-content: center;
 }
 
-.gen{
-    background-color: rgb(255, 255, 255);
-    border: 1px solid black;
-    border-radius: 0.3rem;
-    padding: 5px 10px;
+.gen {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid black;
+  border-radius: 0.3rem;
+  padding: 5px 10px;
 }
 
-.gen:hover{
-    background-color: rgb(180, 215, 247);
+.gen:hover {
+  background-color: rgb(180, 215, 247);
 }

@@ -2,8 +2,8 @@ import React from 'react';
 
 const dashboardItems = [
   {
-    title: 'Members',
-    sidebarLabel: 'Members',
+    title: 'User Datas',
+    sidebarLabel: 'User Datas',
     icon: '👥',
     bg: 'alert-primary'
   },
@@ -39,7 +39,6 @@ const Dashboard = ({ onSectionChange }) => {
     <div className="container py-5">
       <h2 className="mb-4 text-center">📊 Akatsuki-Gym Dashboard</h2>
 
-      {/* Other Dashboard Items */}
       <div className="row g-4">
         {dashboardItems.map((item, index) => (
           <div className="col-12 col-md-6 col-lg-4" key={index}>
