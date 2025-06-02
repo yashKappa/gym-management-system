@@ -13,6 +13,8 @@ const Receipt = ({ member, onClose }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const messageRef = useRef(null);
+  const [monthName, setMonthName] = useState(''); 
+
 
   useEffect(() => {
     if ((message || errorMessage) && messageRef.current) {
@@ -47,6 +49,7 @@ const Receipt = ({ member, onClose }) => {
       await addDoc(receiptCollectionRef, {
         amountPaid: Number(amountPaid),
         months: Number(months),
+          monthName: monthName.trim(), 
         date,
         createdAt: serverTimestamp(),
         trainer: member.trainer,
@@ -70,7 +73,7 @@ const Receipt = ({ member, onClose }) => {
   };
 
   return (
-    <div className="card p-4">
+    <div className="card p-4 mt-0">
       <div className="d-flex justify-content-between align-items-center">
         <h5>Receipt Form for <strong>{member.name}</strong></h5>
         <button className="btn btn-outline-danger btn-sm" onClick={onClose}>Close</button>
@@ -130,6 +133,17 @@ const Receipt = ({ member, onClose }) => {
               disabled={loading}
             />
           </div>
+          <div className="col-md-6 mt-3">
+  <label className="form-label">Month Name</label>
+  <input
+    type="text"
+    className="form-control"
+    placeholder="Enter Month Name (e.g., January)"
+    value={monthName}
+    onChange={e => setMonthName(e.target.value)}
+    disabled={loading}
+  />
+</div>
           <div className="col-md-6 mt-3 d-none">
             <label className="form-label">Date</label>
             <input

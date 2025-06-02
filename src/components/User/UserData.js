@@ -27,47 +27,56 @@ const UserData = () => {
     const [message, setMessage] = useState('');
     const messageRef = useRef(null);
 
-    const fetchUserData = async () => {
-        try {
-            setLoading(true);
-            const name = Cookies.get('memberName');
-            const accessCode = Cookies.get('memberAccessCode');
+   const fetchUserData = async () => {
+    let tempMessage = '';
+    try {
+        setLoading(true);
+        const name = Cookies.get('memberName');
+        const accessCode = Cookies.get('memberAccessCode');
 
-            if (!name || !accessCode) {
-                setMessage('Missing authentication cookies.');
-                return;
-            }
+        if (!name || !accessCode) {
+            tempMessage = 'Please log in to Akatsuki-Gym to access your data.';
+            setMessage(tempMessage);
+            return;
+        }
 
-            const userRef = doc(db, 'member', name);
-            const userSnap = await getDoc(userRef);
+        const userRef = doc(db, 'member', name);
+        const userSnap = await getDoc(userRef);
 
-            if (!userSnap.exists()) {
-                setMessage('User not found.');
-                return;
-            }
+        if (!userSnap.exists()) {
+            tempMessage = 'User not found.';
+            setMessage(tempMessage);
+            return;
+        }
 
-            const user = userSnap.data();
+        const user = userSnap.data();
 
-            if (user.accessCode !== accessCode) {
-                setMessage('Access code mismatch.');
-                return;
-            }
+        if (user.accessCode !== accessCode) {
+            tempMessage = 'Access code mismatch.';
+            setMessage(tempMessage);
+            return;
+        }
 
-            setUserData(user);
+        setUserData(user);
 
-            const receiptSnapshot = await getDocs(collection(db, 'member', name, 'Receipt'));
-            const receipts = receiptSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const receiptSnapshot = await getDocs(collection(db, 'member', name, 'Receipt'));
+        const receipts = receiptSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            setReceiptData(receipts);
-            setMessage('User data refreshed.');
-        } catch (error) {
-            console.error('❌ Error fetching user data:', error);
-            setMessage('Failed to fetch user data.');
-        } finally {
-            setLoading(false);
+        setReceiptData(receipts);
+        tempMessage = 'User data refreshed.';
+        setMessage(tempMessage);
+    } catch (error) {
+        console.error('❌ Error fetching user data:', error);
+        tempMessage = 'Failed to fetch user data.';
+        setMessage(tempMessage);
+    } finally {
+        setLoading(false);
+        if (tempMessage && tempMessage !== 'Please log in to Akatsuki-Gym to access your data.') {
             setTimeout(() => setMessage(''), 3000);
         }
-    };
+    }
+};
+
 
     useEffect(() => {
         fetchUserData();
@@ -98,7 +107,8 @@ const UserData = () => {
                     <img
                         src={`${process.env.PUBLIC_URL}/assets/back.png`}
                         alt="No Data"
-                        style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
+                        style={{ width: '100px', marginBottom: '10px', marginTop: '20px' }}
+                        className='data-img'
                     />
                     <p style={{ margin: 0 }}>No User Data Found.</p>
                 </div>
@@ -123,6 +133,7 @@ const UserData = () => {
                                     <i className="fa-solid fa-receipt"></i> Receipt #{i + 1}
                                 </h5>
                                 <hr />
+                                <p><strong>Months:</strong>  {r.monthName}</p>
                                 <p><strong>Amount Paid:</strong> ₹{r.amountPaid}</p>
                                 <p><strong>Months:</strong> {r.months}</p>
                                 <p><strong>Date:</strong> {r.date}</p>

@@ -2,6 +2,23 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { db } from '../../Firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
+const alertClasses = [
+  'alert-success',
+  'alert-info',
+  'alert-warning',
+  'alert-primary',
+  'alert-secondary',
+  'alert-danger',
+  'alert-dark',
+  'alert-light',
+  'alert-themed-blue',
+  'alert-neutral',
+  'alert-highlight',
+  'alert-urgent',
+  'alert-muted',
+  'alert-glow'
+];
+
 const ReceiptData = ({ memberName }) => {
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -45,7 +62,7 @@ const ReceiptData = ({ memberName }) => {
   if (!memberName) return <p>Please select a member to view receipts.</p>;
 
   return (
-    <div>
+    <div className='mt-4'>
       <div className="d-flex justify-content-between align-items-center">
         <h4>Receipts for {memberName}</h4>
         <button onClick={fetchReceipts} className="rec">
@@ -53,47 +70,40 @@ const ReceiptData = ({ memberName }) => {
         </button>
       </div>
       {error && <p className="text-danger">{error}</p>}
-      {message && <div className="alert alert-info">{message}</div>}
+      {message && <div className="alert alert-info mt-4">{message}</div>}
 
-      {receipts.length === 0 && !loading &&
-        <div className="text-center mt-4">
-          <img
-            src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Receipts"
-            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
-          />
-          <p style={{ margin: 0 }}>No receipts found.</p>
+     {receipts.length === 0 && !loading && (
+  <div className="text-center mt-4">
+    <img
+      src={`${process.env.PUBLIC_URL}/assets/back.png`}
+      alt="No Receipts"
+      style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
+    />
+    <p style={{ margin: 0 }}>No receipts found.</p>
+  </div>
+)}
+
+{receipts.length > 0 && (
+  <div className="row mt-3">
+    {receipts.map((r, idx) => (
+      <div key={r.id} className="col-md-4 mb-4">
+        <div  className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
+          <h5 className="card-title">{r.months}month, {r.monthName}</h5>
+                <hr />
+            <p><strong>Amount Paid:</strong> {r.amountPaid}</p>
+            <p><strong>Trainer:</strong> {r.trainer}</p>
+            <p><strong>Access Code:</strong> {r.accessCode} </p>
+            <p><strong>Contact:</strong> {r.contact} </p>
+            <p><strong>Created At:</strong> {formatDate(r.createdAt)}</p>
         </div>
-      }
-      {receipts.length > 0 && (
-        <div className="table-responsive mt-3">
-          <table className="table table-bordered table-hover">
-            <thead className="table-light">
-              <tr>
-                <th>Months</th>
-                <th>Amount Paid</th>
-                <th>Trainer</th>
-                <th>Access Code</th>
-                <th>Contact</th>
-                <th>Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {receipts.map(r => (
-                <tr key={r.id}>
-                  <td>{r.months}</td>
-                  <td>{r.amountPaid}</td>
-                  <td>{r.trainer}</td>
-                  <td>{r.accessCode}</td>
-                  <td>{r.contact}</td>
-                  <td>{formatDate(r.createdAt)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      </div>
+    ))}
+  </div>
+)}
+
+
+  </div>
+
   );
 };
 

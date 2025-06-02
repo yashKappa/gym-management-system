@@ -135,7 +135,8 @@
 }
 
 
-input:focus {
+input:focus,
+select:focus {
   box-shadow: none !important;
   border: 1px solid rgb(134, 134, 134) !important;
 }
@@ -301,4 +302,10 @@ textarea:focus {
 
 .gen:hover {
   background-color: rgb(180, 215, 247);
+}
+
+@media (max-width: 600px) {
+  .data-img{
+    min-width: 30% !important;
+  }
 }
