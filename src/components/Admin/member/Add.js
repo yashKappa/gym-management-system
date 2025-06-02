@@ -141,8 +141,8 @@ const Add = () => {
                 </div>
               )}
               <div className="form-buttons">
-                <button type="submit" className="submit-btn">Submit</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
+                <button type="button" className="dels w-100" onClick={() => setShowForm(false)}>Cancel</button>
+                <button type="submit" className="gen w-100">Submit</button>
               </div>
             </form>
           </div>

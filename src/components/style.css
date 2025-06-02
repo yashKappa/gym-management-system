@@ -309,3 +309,14 @@ textarea:focus {
     min-width: 30% !important;
   }
 }
+
+
+.title{
+  display: flex !important;
+    justify-content: space-between;
+    align-items: center !important;
+}
+
+.title p{
+  margin: 0%;
+}

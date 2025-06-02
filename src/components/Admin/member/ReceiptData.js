@@ -87,14 +87,18 @@ const ReceiptData = ({ memberName }) => {
   <div className="row mt-3">
     {receipts.map((r, idx) => (
       <div key={r.id} className="col-md-4 mb-4">
-        <div  className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
-          <h5 className="card-title">{r.months}month, {r.monthName}</h5>
-                <hr />
-            <p><strong>Amount Paid:</strong> {r.amountPaid}</p>
-            <p><strong>Trainer:</strong> {r.trainer}</p>
-            <p><strong>Access Code:</strong> {r.accessCode} </p>
-            <p><strong>Contact:</strong> {r.contact} </p>
-            <p><strong>Created At:</strong> {formatDate(r.createdAt)}</p>
+        <div className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
+          <h5 className="card-title">
+            <div className='title'>
+              <p>{r.monthName}</p> <p><i className="fa-solid fa-receipt"></i>  Receipt #{receipts.length - idx}</p>
+            </div>
+          </h5>
+          <hr />
+          <p><strong>Amount Paid:</strong> {r.amountPaid}</p>
+          <p><strong>Trainer:</strong> {r.trainer}</p>
+          <p><strong>Access Code:</strong> {r.accessCode}</p>
+          <p><strong>Contact:</strong> {r.contact}</p>
+          <p><strong>Created At:</strong> {formatDate(r.createdAt)}</p>
         </div>
       </div>
     ))}

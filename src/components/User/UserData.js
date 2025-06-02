@@ -4,20 +4,20 @@ import { db } from '../Firebase';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 
 const alertClasses = [
-  'alert-success',
-  'alert-info',
-  'alert-warning',
-  'alert-primary',
-  'alert-secondary',
-  'alert-danger',
-  'alert-dark',
-  'alert-light',
-  'alert-themed-blue',
-  'alert-neutral',      
-  'alert-highlight',      
-  'alert-urgent',        
-  'alert-muted',         
-  'alert-glow'      
+    'alert-success',
+    'alert-info',
+    'alert-warning',
+    'alert-primary',
+    'alert-secondary',
+    'alert-danger',
+    'alert-dark',
+    'alert-light',
+    'alert-themed-blue',
+    'alert-neutral',
+    'alert-highlight',
+    'alert-urgent',
+    'alert-muted',
+    'alert-glow'
 ];
 
 const UserData = () => {
@@ -27,55 +27,57 @@ const UserData = () => {
     const [message, setMessage] = useState('');
     const messageRef = useRef(null);
 
-   const fetchUserData = async () => {
-    let tempMessage = '';
-    try {
-        setLoading(true);
-        const name = Cookies.get('memberName');
-        const accessCode = Cookies.get('memberAccessCode');
+    const fetchUserData = async () => {
+        let tempMessage = '';
+        try {
+            setLoading(true);
+            const name = Cookies.get('memberName');
+            const accessCode = Cookies.get('memberAccessCode');
 
-        if (!name || !accessCode) {
-            tempMessage = 'Please log in to Akatsuki-Gym to access your data.';
+            if (!name || !accessCode) {
+                tempMessage = 'Please log in to Akatsuki-Gym to access your data.';
+                setMessage(tempMessage);
+                return;
+            }
+
+            const userRef = doc(db, 'member', name);
+            const userSnap = await getDoc(userRef);
+
+            if (!userSnap.exists()) {
+                tempMessage = 'User not found.';
+                setMessage(tempMessage);
+                return;
+            }
+
+            const user = userSnap.data();
+
+            if (user.accessCode !== accessCode) {
+                tempMessage = 'Access code mismatch.';
+                setMessage(tempMessage);
+                return;
+            }
+
+            setUserData(user);
+
+            const receiptSnapshot = await getDocs(collection(db, 'member', name, 'Receipt'));
+            const receipts = receiptSnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .sort((a, b) => new Date(b.date) - new Date(a.date)); // sort descending by date
+            setReceiptData(receipts);
+
+            tempMessage = 'User data refreshed.';
             setMessage(tempMessage);
-            return;
-        }
-
-        const userRef = doc(db, 'member', name);
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-            tempMessage = 'User not found.';
+        } catch (error) {
+            console.error('❌ Error fetching user data:', error);
+            tempMessage = 'Failed to fetch user data.';
             setMessage(tempMessage);
-            return;
+        } finally {
+            setLoading(false);
+            if (tempMessage && tempMessage !== 'Please log in to Akatsuki-Gym to access your data.') {
+                setTimeout(() => setMessage(''), 3000);
+            }
         }
-
-        const user = userSnap.data();
-
-        if (user.accessCode !== accessCode) {
-            tempMessage = 'Access code mismatch.';
-            setMessage(tempMessage);
-            return;
-        }
-
-        setUserData(user);
-
-        const receiptSnapshot = await getDocs(collection(db, 'member', name, 'Receipt'));
-        const receipts = receiptSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        setReceiptData(receipts);
-        tempMessage = 'User data refreshed.';
-        setMessage(tempMessage);
-    } catch (error) {
-        console.error('❌ Error fetching user data:', error);
-        tempMessage = 'Failed to fetch user data.';
-        setMessage(tempMessage);
-    } finally {
-        setLoading(false);
-        if (tempMessage && tempMessage !== 'Please log in to Akatsuki-Gym to access your data.') {
-            setTimeout(() => setMessage(''), 3000);
-        }
-    }
-};
+    };
 
 
     useEffect(() => {
@@ -130,8 +132,9 @@ const UserData = () => {
                         <div className="col-12 col-md-6" key={r.id}>
                             <div className={`alert ${alertClasses[(i + 1) % alertClasses.length]} shadow-sm`}>
                                 <h5 className="alert-heading">
-                                    <i className="fa-solid fa-receipt"></i> Receipt #{i + 1}
+                                    <i className="fa-solid fa-receipt"></i> Receipt #{receiptData.length - i}
                                 </h5>
+
                                 <hr />
                                 <p><strong>Months:</strong>  {r.monthName}</p>
                                 <p><strong>Amount Paid:</strong> ₹{r.amountPaid}</p>

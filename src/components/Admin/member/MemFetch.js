@@ -130,13 +130,13 @@ const MemFetch = () => {
       <p><strong>Access Code:</strong> {m.accessCode}</p>
       <div className="d-flex justify-content-end">
         <button
-          className="btn btn-primary btn-sm me-2"
+          className="rec me-2"
           onClick={() => setSelectedMember(m)}
         >
           Receipt
         </button>
         <button
-          className="btn btn-danger btn-sm"
+          className="dels btn-sm"
           onClick={() => setConfirmId(m.id)}
         >
           <i className="fa-solid fa-trash"></i> Delete
@@ -160,8 +160,8 @@ const MemFetch = () => {
             <h5 className="mb-3">Confirm Deletion</h5>
             <p>Are you sure you want to delete this member?</p>
             <div className="d-flex justify-content-end">
-              <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => deleteMember(confirmId)}>Yes, Delete</button>
+              <button className="rec me-2" onClick={() => setConfirmId(null)}>Cancel</button>
+              <button className="dels btn-danger" onClick={() => deleteMember(confirmId)}>Yes, Delete</button>
             </div>
           </div>
         </div>
