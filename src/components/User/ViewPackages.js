@@ -48,6 +48,14 @@ const ViewPackages = () => {
     fetchPackages();
   }, []);
 
+  // Scroll the message alert into view whenever message changes and is not empty
+  useEffect(() => {
+    if (message && messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Optional: set focus for accessibility
+      messageRef.current.focus();
+    }
+  }, [message]);
 
   return (
     <div className="container py-5">
@@ -84,7 +92,7 @@ const ViewPackages = () => {
             <div className="col-12 col-md-4" key={pkg.id}>
               <div className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
                 <h5 className="alert-heading d-flex align-items-center gap-2">
-                  <i class="fa-solid fa-sack-dollar"></i> {pkg.name}
+                  <i className="fa-solid fa-sack-dollar"></i> {pkg.name}
                 </h5>
                 <hr />
                 <p><strong>Price:</strong> ₹{pkg.price}</p>
@@ -96,8 +104,6 @@ const ViewPackages = () => {
                     ))}
                   </ul>
                 )}
-                <div className="d-flex justify-content-end">
-                </div>
               </div>
             </div>
           ))}

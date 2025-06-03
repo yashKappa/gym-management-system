@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../Firebase';
 
 const alertClasses = [
@@ -21,11 +21,12 @@ const alertClasses = [
 
 const ViewDietPlans = () => {
   const [dietPlans, setDietPlans] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
   const [activeTab, setActiveTab] = useState('beginner');
   const [confirmId, setConfirmId] = useState(null);
+
   const mealOrder = ['breakfast', 'snack', 'lunch', 'snack2', 'dinner', 'post workout'];
   const normalize = (str) => str?.toLowerCase().replace(/\s+/g, '');
 
@@ -33,30 +34,33 @@ const ViewDietPlans = () => {
     setMessage(msg);
     setTimeout(() => setMessage(''), 3000);
   };
-
-  const fetchDietPlans = async () => {
-    try {
-      setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'Details', 'Diets', 'plans'));
-      const plans = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setDietPlans(plans);
-      showMessage('Diet plans refreshed.');
-    } catch (error) {
-      console.error('❌ Error fetching diet plans:', error);
-      showMessage('Failed to fetch diet plans.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   useEffect(() => {
-    fetchDietPlans();
+    setLoading(true);
+    // Real-time listener
+    const unsubscribe = onSnapshot(
+      collection(db, 'Details', 'Diets', 'plans'),
+      (snapshot) => {
+        const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setDietPlans(plans);
+        setLoading(false);
+        showMessage('Diet plans updated.');
+      },
+      (error) => {
+        console.error('❌ Error fetching diet plans:', error);
+        setLoading(false);
+        showMessage('Failed to fetch diet plans.');
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => unsubscribe();
   }, []);
 
   const handleDelete = async (id) => {
     try {
       await deleteDoc(doc(db, 'Details', 'Diets', 'plans', id));
-      setDietPlans(prev => prev.filter(plan => plan.id !== id));
       showMessage('Diet plan deleted successfully.');
     } catch (error) {
       console.error('❌ Error deleting diet plan:', error);
@@ -65,7 +69,6 @@ const ViewDietPlans = () => {
       setConfirmId(null);
     }
   };
-
 
   const filteredPlans = dietPlans
     .filter(plan => plan.level?.toLowerCase() === activeTab)
@@ -79,8 +82,12 @@ const ViewDietPlans = () => {
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>🏋️‍♂️ Gym Diet Plans</h3>
-        <button className="rec" onClick={fetchDietPlans} disabled={loading}>
-          <i className="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
+        <button
+          className="rec"
+          onClick={() => showMessage('Real-time updates active, no manual refresh needed')}
+          disabled={loading}
+        >
+          <i className="fa-solid fa-rotate"></i> {loading ? 'Loading...' : 'Real-time Active'}
         </button>
       </div>
 

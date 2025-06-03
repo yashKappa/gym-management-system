@@ -60,6 +60,7 @@ const Receipt = ({ member, onClose }) => {
       setMessage('Receipt saved successfully!');
       setAmountPaid('');
       setMonths('');
+      setMonthName('');
       setDate(today);
 
       setTimeout(() => setMessage(''), 3000);

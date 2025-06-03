@@ -34,35 +34,44 @@ const Notification = () => {
     }
   };
 
-  useEffect(() => {
-    if (successMessage && successRef.current) successRef.current.focus();
-    if (errorMessage && errorRef.current) errorRef.current.focus();
-  }, [successMessage, errorMessage]);
+useEffect(() => {
+  if (successMessage && successRef.current) {
+    successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    successRef.current.focus();
+  }
+
+  if (errorMessage && errorRef.current) {
+    errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    errorRef.current.focus();
+  }
+}, [successMessage, errorMessage]);
+
 
   return (
     <div className="container pt-4">
       <h3 className="text-center mb-4">🔔 Notification</h3>
 
       {successMessage && (
-        <div
-          className="alert alert-success"
-          role="alert"
-          ref={successRef}
-          tabIndex={-1}
-        >
-          {successMessage}
-        </div>
-      )}
-      {errorMessage && (
-        <div
-          className="alert alert-danger"
-          role="alert"
-          ref={errorRef}
-          tabIndex={-1}
-        >
-          {errorMessage}
-        </div>
-      )}
+  <div
+    className="alert alert-success"
+    role="alert"
+    ref={successRef}
+    tabIndex="-1"
+  >
+    {successMessage}
+  </div>
+)}
+
+{errorMessage && (
+  <div
+    className="alert alert-danger "
+    role="alert"
+    ref={errorRef}
+    tabIndex="-1"
+  >
+    {errorMessage}
+  </div>
+)}
 
       <form onSubmit={handleSubmit} className="bg-light border p-4 rounded shadow-sm">
         <div className="mb-3">

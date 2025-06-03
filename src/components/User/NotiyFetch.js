@@ -1,54 +1,36 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db } from '../Firebase';
 import { BsBellFill } from 'react-icons/bs';
 
-const alertClasses = [
-  'alert-success',
-  'alert-info',
-  'alert-warning',
-  'alert-primary',
-  'alert-secondary',
-  'alert-danger',
-  'alert-dark',
-  'alert-light',
-  'alert-themed-blue',
-  'alert-neutral',
-  'alert-highlight',
-  'alert-urgent',
-  'alert-muted',
-  'alert-glow'
-];
+const alertClasses = ['alert-secondary', 'alert-primary', 'alert-success', 'alert-warning', 'alert-info'];
 
 const NotificationFetch = () => {
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
 
-  const showMessage = (msg) => {
-    setMessage(msg);
-    setTimeout(() => setMessage(''), 3000);
-  };
-
-
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'Details', 'Notifications', 'details'));
-      const notificationList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setNotifications(notificationList);
-      showMessage('Notifications refreshed.');
-    } catch (error) {
-      console.error('❌ Error fetching notifications:', error);
-      showMessage('Failed to fetch notifications.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchNotifications();
+    const q = query(collection(db, 'Details', 'Notifications', 'details'));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setNotifications(list);
+        setLoading(false);
+        setMessage('Live notifications updated.');
+        setTimeout(() => setMessage(''), 3000);
+      },
+      (error) => {
+        console.error('❌ Error fetching notifications:', error);
+        setMessage('Failed to fetch notifications.');
+        setTimeout(() => setMessage(''), 3000);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
 
@@ -56,9 +38,6 @@ const NotificationFetch = () => {
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>🔔 Notifications</h3>
-        <button className="rec" onClick={fetchNotifications} disabled={loading}>
-          <i className="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
       </div>
 
       {message && (
@@ -67,11 +46,13 @@ const NotificationFetch = () => {
         </div>
       )}
 
-      {notifications.length === 0 ? (
+      {loading ? (
+        <p>Loading notifications...</p>
+      ) : notifications.length === 0 ? (
         <div className="text-center mt-4">
           <img
             src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Receipts"
+            alt="No Notifications"
             style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
           />
           <p style={{ margin: 0 }}>No Notification found.</p>
@@ -86,8 +67,6 @@ const NotificationFetch = () => {
                 </h5>
                 <hr />
                 <p>{notification.msg || 'No message content.'}</p>
-                <div className="d-flex justify-content-end">
-                </div>
               </div>
             </div>
           ))}

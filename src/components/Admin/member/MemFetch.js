@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { db } from '../../Firebase';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import Receipt from './Receipt';
 
 const alertClasses = [
@@ -22,7 +22,6 @@ const alertClasses = [
 
 const MemFetch = () => {
   const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
@@ -30,46 +29,59 @@ const MemFetch = () => {
   const [selectedMember, setSelectedMember] = useState(null);
 
 
-  useEffect(() => {
-    fetchMembers();
-  }, []);
+useEffect(() => {
+  const unsubscribe = onSnapshot(collection(db, 'member'), (snapshot) => {
+    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setMembers(data);
+    setMessage('Live data updated.');
+    setTimeout(() => setMessage(''), 3000);
+  }, (error) => {
+    console.error("Error listening to real-time updates:", error);
+    setMessage('Failed to get real-time data.');
+    setTimeout(() => setMessage(''), 3000);
+  });
 
-  const fetchMembers = async () => {
-    try {
-      setLoading(true);
-      const snapshot = await getDocs(collection(db, 'member'));
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMembers(data);
-      setMessage('Data refreshed.');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (error) {
-      setMessage('Failed to fetch members.');
-      setTimeout(() => setMessage(''), 3000);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Clean up listener on component unmount
+  return () => unsubscribe();
+}, []);
 
-  const deleteMember = async (id) => {
-    try {
-      // If you have subcollections, handle them here (optional)
-      await deleteDoc(doc(db, 'member', id));
-      setMembers(prev => prev.filter(m => m.id !== id));
-      setMessage('Member deleted successfully.');
-      setTimeout(() => {
-        if (messageRef.current) {
-          messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          messageRef.current.focus();
-        }
-      }, 100);
-      setTimeout(() => setMessage(''), 3000);
-    } catch (error) {
-      setMessage('Failed to delete member.');
-      setTimeout(() => setMessage(''), 3000);
-    } finally {
-      setConfirmId(null);
-    }
-  };
+
+const deleteMember = async (id) => {
+  try {
+    // Step 1: Delete all documents in the 'Receipt' subcollection
+    const receiptRef = collection(db, `member/${id}/Receipt`);
+    const receiptSnapshot = await getDocs(receiptRef);
+
+    const deleteReceiptDocs = receiptSnapshot.docs.map((docSnap) =>
+      deleteDoc(doc(db, `member/${id}/Receipt`, docSnap.id))
+    );
+
+    await Promise.all(deleteReceiptDocs);
+
+    // Step 2: Delete the main member document
+    await deleteDoc(doc(db, 'member', id));
+
+    // Update UI
+    setMembers(prev => prev.filter(m => m.id !== id));
+    setMessage('Member and all related data deleted successfully.');
+
+    setTimeout(() => {
+      if (messageRef.current) {
+        messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        messageRef.current.focus();
+      }
+    }, 100);
+
+    setTimeout(() => setMessage(''), 3000);
+  } catch (error) {
+    console.error('Error deleting member:', error);
+    setMessage('Failed to delete member and related data.');
+    setTimeout(() => setMessage(''), 3000);
+  } finally {
+    setConfirmId(null);
+  }
+};
+
 
   // Filter members based on search query (case-insensitive)
   const filtered = members.filter(member =>
@@ -82,15 +94,12 @@ const MemFetch = () => {
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>🏋️‍♂️ Members</h3>
-        <button className="rec" onClick={fetchMembers} disabled={loading}>
-          <i className="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
       </div>
 
       {message && (
         <div
           ref={messageRef}
-          tabIndex={-1} // to make div focusable for scrollIntoView
+          tabIndex={-1} 
           className="alert alert-info"
           style={{ outline: 'none' }}
         >
