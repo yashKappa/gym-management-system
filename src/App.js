@@ -9,7 +9,6 @@ import Admin from './components/Admin/Admin';
 import Start from './components/User/Start';
 import UserLogin from './components/User-Login/UserLogin';
 import AdminLogin from './components/Login/Login';
-import Dashboard from './components/User/Dashboard';
 function App() {
   const navigate = useNavigate();
 
