@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../Firebase';
 import { FaDumbbell } from 'react-icons/fa';
 
@@ -22,38 +22,36 @@ const alertClasses = [
 
 const SupplementsFetch = () => {
   const [supplements, setSupplements] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
 
-  const fetchSupplements = async () => {
-    try {
-      setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'Details', 'Supplements', 'details'));
-      const dataList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setSupplements(dataList);
-      setMessage('Supplements refreshed.');
-    } catch (error) {
-      console.error('❌ Error fetching supplements:', error);
-      setMessage('Failed to fetch supplements.');
-    } finally {
-      setLoading(false);
-      setTimeout(() => setMessage(''), 3000);
-    }
-  };
-
   useEffect(() => {
-    fetchSupplements();
-  }, []);
+    const unsubscribe = onSnapshot(
+      collection(db, 'Details', 'Supplements', 'details'),
+      (querySnapshot) => {
+        const dataList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setSupplements(dataList);
+        setMessage('Supplements updated.');
+        setTimeout(() => setMessage(''), 3000);
+      },
+      (error) => {
+        console.error('❌ Error in real-time update:', error);
+        setMessage('Real-time update failed.');
+        setTimeout(() => setMessage(''), 3000);
+      }
+    );
 
+    // Clean up on unmount
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3>💪 Supplements</h3>
-        <button className="rec" onClick={fetchSupplements} disabled={loading}>
-          <i className="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
       </div>
 
       {message && (
@@ -66,7 +64,7 @@ const SupplementsFetch = () => {
         <div className="text-center mt-4">
           <img
             src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Receipts"
+            alt="No Supplements"
             style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
           />
           <p style={{ margin: 0 }}>No Supplements found.</p>
@@ -87,15 +85,11 @@ const SupplementsFetch = () => {
                   style={{ maxHeight: '150px', objectFit: 'cover' }}
                 />
                 <p>{supplement.description || 'No description available.'}</p>
-                <div className="d-flex justify-content-end">
-                </div>
               </div>
             </div>
           ))}
         </div>
       )}
-
-
     </div>
   );
 };

@@ -82,13 +82,6 @@ const ViewDietPlans = () => {
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>🏋️‍♂️ Gym Diet Plans</h3>
-        <button
-          className="rec"
-          onClick={() => showMessage('Real-time updates active, no manual refresh needed')}
-          disabled={loading}
-        >
-          <i className="fa-solid fa-rotate"></i> {loading ? 'Loading...' : 'Real-time Active'}
-        </button>
       </div>
 
       {message && (

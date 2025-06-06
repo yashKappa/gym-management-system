@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../Firebase';
 
 const alertClasses = [
@@ -21,38 +21,37 @@ const alertClasses = [
 
 const ViewPackages = () => {
   const [packages, setPackages] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
 
-  const id = 'pack';
-
-  const fetchPackages = async () => {
-    try {
-      setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'Details', id, 'details'));
-      const packageList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setPackages(packageList);
-      setMessage('Packages refreshed.');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (error) {
-      console.error('❌ Error fetching packages:', error);
-      setMessage('Failed to fetch packages.');
-      setTimeout(() => setMessage(''), 3000);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const id = 'pack'; // Firestore document ID under 'Details'
 
   useEffect(() => {
-    fetchPackages();
+    const unsubscribe = onSnapshot(
+      collection(db, 'Details', id, 'details'),
+      (snapshot) => {
+        const packageList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setPackages(packageList);
+        setMessage('Packages updated.');
+        setTimeout(() => setMessage(''), 3000);
+      },
+      (error) => {
+        console.error('❌ Error with real-time update:', error);
+        setMessage('Real-time update failed.');
+        setTimeout(() => setMessage(''), 3000);
+      }
+    );
+
+    // Cleanup on unmount
+    return () => unsubscribe();
   }, []);
 
-  // Scroll the message alert into view whenever message changes and is not empty
   useEffect(() => {
     if (message && messageRef.current) {
       messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Optional: set focus for accessibility
       messageRef.current.focus();
     }
   }, [message]);
@@ -61,9 +60,6 @@ const ViewPackages = () => {
     <div className="container py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>💰 Gym Packages</h3>
-        <button className="rec" onClick={fetchPackages} disabled={loading}>
-          <i className="fa-solid fa-rotate"></i> {loading ? 'Refreshing...' : 'Refresh'}
-        </button>
       </div>
 
       {message && (
@@ -81,7 +77,7 @@ const ViewPackages = () => {
         <div className="text-center mt-4">
           <img
             src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Receipts"
+            alt="No Packages"
             style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
           />
           <p style={{ margin: 0 }}>No Packages found.</p>
