@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../Firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import DataFetch from './DataFetch';
+import MemberData from './MemberData';
 
 const dashboardItems = [
   {
@@ -78,7 +80,6 @@ const Dashboard = ({ onSectionChange }) => {
   return (
     <div className="container py-5">
       <h2 className="mb-4 text-center">📊 Akatsuki-Gym Dashboard</h2>
-
       {/* Other Dashboard Items */}
       <div className="row g-4">
         {dashboardItems.map((item, index) => (
@@ -101,6 +102,8 @@ const Dashboard = ({ onSectionChange }) => {
         ))}
       </div>
 
+            <DataFetch />
+            <MemberData />
 
       <div className="mb-5 p-4 border rounded shadow-sm bg-light">
         <h4 className="mb-3 d-flex align-items-center gap-2">

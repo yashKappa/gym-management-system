@@ -23,48 +23,48 @@ const Add = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  setErrorMessage('');
+  setSuccessMessage('');
 
-    setErrorMessage(''); // Clear previous error
+  // Step 1: Generate accessCode
+  const initials = formData.name
+    .split(' ')
+    .map(word => word[0]?.toUpperCase())
+    .join('');
 
-    // Check if member with same name exists
-    const memberDocRef = doc(db, 'member', formData.name);
-    const memberDocSnap = await getDoc(memberDocRef);
+  const contactSuffix = formData.contact.slice(-4);
+  const randomNum = Math.floor(100 + Math.random() * 900);
+  const accessCode = `${initials}${contactSuffix}${randomNum}`;
 
-    if (memberDocSnap.exists()) {
-      setErrorMessage('Member name already exists');
-      setSuccessMessage('');
-      return; // Stop submission
-    }
+  const memberDocRef = doc(db, 'member', accessCode);
+  const memberDocSnap = await getDoc(memberDocRef);
 
-    const initials = formData.name
-      .split(' ')
-      .map(word => word[0] ? word[0].toUpperCase() : '')
-      .join('');
+  // Step 2: Check for duplicate accessCode
+  if (memberDocSnap.exists()) {
+    setErrorMessage('⚠️ Access code already exists. Please try again.');
+    return;
+  }
 
-    const contactSuffix = formData.contact.slice(-4);
-    const randomNum = Math.floor(100 + Math.random() * 900);
-    const accessCode = `${initials}${contactSuffix}${randomNum}`;
+  try {
+    // Step 3: Store in 'member' collection using accessCode as ID
+    await setDoc(memberDocRef, {
+      ...formData,
+      accessCode,
+      timestamp: new Date()
+    });
 
-    try {
-      await setDoc(memberDocRef, {
-        ...formData,
-        accessCode,
-        timestamp: new Date()
-      });
+    setSuccessMessage(`✅ Member added successfully! Access Code: ${accessCode}`);
+    setFormData({ name: '', contact: '', joiningDateTime: '', trainer: 'None' });
+    setShowForm(false);
 
-      setSuccessMessage(`Member added successfully! Access Code: ${accessCode}`);
-      setErrorMessage('');
-      setShowForm(false);
-      setFormData({ name: '', contact: '', joiningDateTime: '', trainer: 'None' });
+    setTimeout(() => setSuccessMessage(''), 5000);
+  } catch (error) {
+    console.error('Error adding document: ', error);
+    setErrorMessage(`❌ Failed to add member: ${error.message}`);
+  }
+};
 
-      setTimeout(() => setSuccessMessage(''), 5000);
-    } catch (error) {
-      console.error('Error adding document: ', error);
-      setErrorMessage(`❌ Failed to add member: ${error.message}`);
-      setSuccessMessage('');
-    }
-  };
 
   useEffect(() => {
     if (successMessage && successRef.current) successRef.current.focus();

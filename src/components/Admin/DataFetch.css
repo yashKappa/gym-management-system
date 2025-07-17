@@ -1,0 +1,36 @@
+.diet-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-around;
+  padding: 50px 0px 50px 0px;
+}
+
+.card-box {
+  background-color: #ffffff;
+  border-radius: 0.3rem;
+  border: 1px solid gray;
+  width: 250px;
+  padding: 20px;
+  text-align: center;
+  transition: 0.3s ease;
+}
+
+
+
+.card-box:hover {
+  transform: scale(1.03);
+  background-color: #e0eaff;
+}
+
+.card-box h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.card-box p {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
