@@ -3,7 +3,7 @@ import React from 'react';
 const dashboardItems = [
   {
     title: 'User Datas',
-    sidebarLabel: 'User Datas',
+    sidebarLabel: 'User Data',
     icon: '👥',
     bg: 'alert-primary'
   },
