@@ -21,7 +21,7 @@ const alertClasses = [
 
 const ViewDietPlans = () => {
   const [dietPlans, setDietPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
   const [activeTab, setActiveTab] = useState('beginner');
@@ -56,7 +56,7 @@ const ViewDietPlans = () => {
 
     // Cleanup listener on unmount
     return () => unsubscribe();
-  }, []);
+  },);
 
   const handleDelete = async (id) => {
     try {

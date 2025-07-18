@@ -78,7 +78,7 @@ const MemberData = () => {
 
   useEffect(() => {
     fetchMembers();
-  }, [currentWeekOffset]);
+  },);
 
   return (
     <div className="member-container">
