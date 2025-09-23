@@ -21,7 +21,7 @@ const alertClasses = [
 
 const ViewDietPlans = () => {
   const [dietPlans, setDietPlans] = useState([]);
-  const [setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
   const [activeTab, setActiveTab] = useState('beginner');
