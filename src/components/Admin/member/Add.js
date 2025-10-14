@@ -22,10 +22,18 @@ const Add = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
   setErrorMessage('');
   setSuccessMessage('');
+
+  // Use the member's name as the document ID (like "Dhananjay")
+  const memberId = formData.name.trim();
+
+  if (!memberId) {
+    setErrorMessage('⚠️ Please enter a valid member name.');
+    return;
+  }
 
   // Step 1: Generate accessCode
   const initials = formData.name
@@ -37,24 +45,24 @@ const Add = () => {
   const randomNum = Math.floor(100 + Math.random() * 900);
   const accessCode = `${initials}${contactSuffix}${randomNum}`;
 
-  const memberDocRef = doc(db, 'member', accessCode);
+  const memberDocRef = doc(db, 'member', memberId);
   const memberDocSnap = await getDoc(memberDocRef);
 
-  // Step 2: Check for duplicate accessCode
+  // Step 2: Check for duplicate entry
   if (memberDocSnap.exists()) {
-    setErrorMessage('⚠️ Access code already exists. Please try again.');
+    setErrorMessage(`⚠️ Member "${memberId}" already exists.`);
     return;
   }
 
   try {
-    // Step 3: Store in 'member' collection using accessCode as ID
+    // Step 3: Store member data under /member/{name}
     await setDoc(memberDocRef, {
       ...formData,
-      accessCode,
+      accessCode, // store access code in document
       timestamp: new Date()
     });
 
-    setSuccessMessage(`✅ Member added successfully! Access Code: ${accessCode}`);
+    setSuccessMessage(`✅ Member "${memberId}" added successfully! Access Code: ${accessCode}`);
     setFormData({ name: '', contact: '', joiningDateTime: '', trainer: 'None' });
     setShowForm(false);
 
