@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
 /* ===== CSS VARIABLES ===== */
+
 :root {
   --primary: #ff6b35;
   --primary-dark: #e55a2b;
@@ -32,6 +33,7 @@
   font-family: 'Rajdhani', sans-serif;
   color: var(--text-primary);
   overflow-x: hidden;
+  width: 100%;
 }
 
 /* ===== HERO SECTION ===== */
@@ -43,7 +45,7 @@
   justify-content: center;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%),
-              url('/assets/back.png') center/cover no-repeat;
+              url('../../assets/back.png') center/cover no-repeat;
 }
 
 .hero-section::before {
@@ -53,8 +55,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('/assets/g-logo1.png') center/contain no-repeat;
+  background: url('../../assets/g-logo1.png') no-repeat center;
+  background-size: contain;
   opacity: 0.05;
+  filter: brightness(0) invert(1);
   animation: pulse-logo 4s ease-in-out infinite;
 }
 
@@ -433,7 +437,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('/assets/back.png') center/cover;
+  background: url('../../assets/back.png') center/cover;
   opacity: 0.1;
   filter: grayscale(100%);
 }
