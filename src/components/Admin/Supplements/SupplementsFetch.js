@@ -1,52 +1,40 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { collection, query, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../Firebase';
-import { FaDumbbell } from 'react-icons/fa';
+import { Dumbbell, Sparkles, ShieldAlert, PackageCheck, Trash2 } from 'lucide-react';
+import '../../User/SupplementsFetch.css';
 
-const alertClasses = [
-  'alert-success',
-  'alert-info',
-  'alert-warning',
-  'alert-primary',
-  'alert-secondary',
-  'alert-danger',
-  'alert-dark',
-  'alert-light',
-  'alert-themed-blue',
-  'alert-neutral',
-  'alert-highlight',
-  'alert-urgent',
-  'alert-muted',
-  'alert-glow'
-];
-
-const SupplementsFetch = () => {
+const SupplementsFetch = ({ isDarkMode }) => {
   const [supplements, setSupplements] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
 
+  // 1. Real-time Firebase Listener
   useEffect(() => {
-    const q = query(
+    const unsubscribe = onSnapshot(
       collection(db, 'Details', 'Supplements', 'details'),
+      (querySnapshot) => {
+        const dataList = querySnapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }));
+        setSupplements(dataList);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('❌ Error in real-time update:', error);
+        setMessage('Real-time update failed.');
+        setTimeout(() => setMessage(''), 3000);
+        setLoading(false);
+      }
     );
 
-    // Set up real-time listener
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const dataList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setSupplements(dataList);
-      setMessage('Supplements updated.');
-      setTimeout(() => setMessage(''), 3000);
-    }, (error) => {
-      console.error('❌ Error fetching supplements:', error);
-      setMessage('Failed to fetch supplements.');
-      setTimeout(() => setMessage(''), 3000);
-    });
-
-    // Cleanup listener on unmount
     return () => unsubscribe();
   }, []);
 
+  // 2. Delete Handler
   const handleDelete = async (id) => {
     try {
       await deleteDoc(doc(db, 'Details', 'Supplements', 'details', id));
@@ -56,79 +44,110 @@ const SupplementsFetch = () => {
           messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 100);
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error('❌ Error deleting supplement:', error);
       setMessage('Failed to delete supplement.');
-      setTimeout(() => {
-        if (messageRef.current) {
-          messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
+      setTimeout(() => setMessage(''), 3000);
     } finally {
       setConfirmId(null);
-      setTimeout(() => setMessage(''), 3000);
     }
   };
 
+  useEffect(() => {
+    if (message && messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      messageRef.current.focus();
+    }
+  }, [message]);
+
   return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>💪 Supplements</h3>
+    <div className={`supplements-theme-wrapper ${isDarkMode ? 'dark' : 'light'}`}>
+      {/* HEADER SECTION */}
+      <div className="supplements-header">
+        <div className="header-badge">
+          <Dumbbell size={14} /> GYM NUTRITION
+        </div>
+        <h2 className="header-title">Supplements Store</h2>
+        <p className="header-subtitle">Browse recommended supplements, proteins, and fitness essentials.</p>
       </div>
 
+      {/* ALERT TOAST */}
       {message && (
-        <div ref={messageRef} className="alert alert-info">
-          {message}
+        <div ref={messageRef} tabIndex={-1} className="theme-toast mb-4">
+          <ShieldAlert size={16} />
+          <span>{message}</span>
         </div>
       )}
 
-      {supplements.length === 0 ? (
-        <div className="text-center mt-4">
-          <img
-            src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Supplements"
-            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
-          />
-          <p style={{ margin: 0 }}>No Supplements found.</p>
+      {/* CONTENT AREA */}
+      {loading ? (
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Loading supplements catalog...</p>
+        </div>
+      ) : supplements.length === 0 ? (
+        <div className="empty-state">
+          <Sparkles size={38} className="empty-icon" />
+          <h3>No Supplements Found</h3>
+          <p>There are currently no active supplements listed in the system.</p>
         </div>
       ) : (
-        <div className="row g-4">
-          {supplements.map((supplement, idx) => (
-            <div className="col-12 col-md-6" key={supplement.id}>
-              <div className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
-                <h5 className="alert-heading d-flex align-items-center gap-2">
-                  <FaDumbbell /> {supplement.name || 'No Name'}
-                </h5>
-                <hr />
+        <div className="supplements-grid">
+          {supplements.map((item) => (
+            <div key={item.id} className="supplement-card">
+              <div className="card-image-wrapper">
                 <img
-                  src={supplement.image || '/default.jpg'}
-                  alt={supplement.name}
-                  className="img-fluid rounded mb-2"
-                  style={{ maxHeight: '200px', objectFit: 'cover' }}
+                  src={item.image || '/assets/back.png'}
+                  alt={item.name || 'Supplement'}
+                  className="supplement-image"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `${process.env.PUBLIC_URL}/assets/back.png`;
+                  }}
                 />
-                <p>{supplement.description || 'No description available.'}</p>
-                <div className="d-flex justify-content-end">
-                  <button
-                    className="dels btn-outline-danger"
-                    onClick={() => setConfirmId(supplement.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
+                <span className="stock-badge">
+                  <PackageCheck size={12} /> AVAILABLE
+                </span>
+              </div>
+
+              <div className="card-details">
+                <h4 className="supplement-title">{item.name || 'Unnamed Product'}</h4>
+                <p className="supplement-description">
+                  {item.description || 'No detailed description available for this supplement.'}
+                </p>
+              </div>
+
+              {/* CARD FOOTER WITH MATCHED DELETE BUTTON */}
+              <div className="card-footer-meta d-flex justify-content-end align-items-center pt-2 mt-2 border-top">
+                <button
+                  className="delete-pkg-btn m-2"
+                  onClick={() => setConfirmId(item.id)}
+                  title="Delete Supplement"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
 
+      {/* DELETE CONFIRMATION MODAL */}
       {confirmId && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
-          <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>
-            <h5 className="mb-3">Confirm Deletion</h5>
-            <p>Are you sure you want to delete this supplement?</p>
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmId)}>Yes, Delete</button>
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h5 className="modal-title">Confirm Deletion</h5>
+            <p className="modal-text">
+              Are you sure you want to delete this supplement? This action cannot be undone.
+            </p>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setConfirmId(null)}>
+                Cancel
+              </button>
+              <button className="btn-confirm-delete" onClick={() => handleDelete(confirmId)}>
+                Yes, Delete
+              </button>
             </div>
           </div>
         </div>

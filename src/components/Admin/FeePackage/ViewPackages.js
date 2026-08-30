@@ -1,61 +1,51 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../Firebase';
+import { Check, Clock, ShieldAlert, Sparkles, Dumbbell, Star, ChevronRight, Trash2 } from 'lucide-react';
+import '../../User/ViewPackages.css';
 
-const alertClasses = [
-  'alert-success',
-  'alert-info',
-  'alert-warning',
-  'alert-primary',
-  'alert-secondary',
-  'alert-danger',
-  'alert-dark',
-  'alert-light',
-  'alert-themed-blue',
-  'alert-neutral',
-  'alert-highlight',
-  'alert-urgent',
-  'alert-muted',
-  'alert-glow'
-];
+const planBadges = ['STARTER', 'POPULAR', 'PRO CHOICE', 'ULTIMATE'];
 
-const ViewPackages = () => {
+const ViewPackages = ({ isDarkMode }) => {
   const [packages, setPackages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [confirmId, setConfirmId] = useState(null);
   const [message, setMessage] = useState('');
+  const [confirmId, setConfirmId] = useState(null); // Tracks package selected for deletion
   const messageRef = useRef(null);
-
   const id = 'pack';
 
+  // 1. Real-time packages listener
   useEffect(() => {
-    const colRef = collection(db, 'Details', id, 'details');
-
-    // Real-time listener
     const unsubscribe = onSnapshot(
-      colRef,
+      collection(db, 'Details', id, 'details'),
       (snapshot) => {
-        const packageList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const packageList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
         setPackages(packageList);
-        setLoading(false);
-        setMessage('Packages updated.');
-        setTimeout(() => setMessage(''), 3000);
       },
       (error) => {
-        console.error('❌ Error fetching packages:', error);
-        setMessage('Failed to fetch packages.');
+        console.error('❌ Error with real-time update:', error);
+        setMessage('Real-time update failed.');
         setTimeout(() => setMessage(''), 3000);
-        setLoading(false);
       }
     );
 
-    // Cleanup listener on unmount
     return () => unsubscribe();
-  }, [id]);
+  }, []);
 
+  // 2. Scroll into view on feedback message
+  useEffect(() => {
+    if (message && messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      messageRef.current.focus();
+    }
+  }, [message]);
+
+  // 3. Firestore delete handler
   const handleDelete = async (packageId) => {
     try {
-      await deleteDoc(doc(db, 'Details', 'pack', 'details', packageId));
+      await deleteDoc(doc(db, 'Details', id, 'details', packageId));
       setMessage('Package deleted successfully.');
 
       setTimeout(() => {
@@ -75,75 +65,122 @@ const ViewPackages = () => {
     }
   };
 
+  const formatPrice = (price) => {
+    if (!price) return '0';
+    return price.toString().replace(/[^0-9,.]/g, '');
+  };
+
   return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>💰 Gym Packages</h3>
+    <div className={`packages-theme-wrapper ${isDarkMode ? 'dark' : 'light'}`}>
+      {/* HEADER SECTION */}
+      <div className="packages-header">
+        <div className="header-badge">
+          <Dumbbell size={14} /> GYM MEMBERSHIPS
+        </div>
+        <h2 className="header-title">Select Your Fitness Plan</h2>
+        <p className="header-subtitle">Choose the perfect tier that fits your goals and routine.</p>
       </div>
 
+      {/* ALERT MESSAGE */}
       {message && (
-        <div
-          ref={messageRef}
-          tabIndex={-1} // to make div focusable
-          className="alert alert-info"
-          style={{ outline: 'none' }}
-        >
-          {message}
+        <div ref={messageRef} tabIndex={-1} className="theme-toast">
+          <ShieldAlert size={16} />
+          <span>{message}</span>
         </div>
       )}
 
-      {loading ? (
-        <p>Loading packages...</p>
-      ) : packages.length === 0 ? (
-        <div className="text-center mt-4">
-          <img
-            src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Packages"
-            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
-          />
-          <p style={{ margin: 0 }}>No Packages found.</p>
+      {/* PACKAGES GRID */}
+      {packages.length === 0 ? (
+        <div className="empty-state">
+          <Sparkles size={36} className="empty-icon" />
+          <p>No active gym packages found in the system.</p>
         </div>
       ) : (
-        <div className="row g-4">
-          {packages.map((pkg, idx) => (
-            <div className="col-12 col-md-4" key={pkg.id}>
-              <div className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
-                <h5 className="alert-heading d-flex align-items-center gap-2">
-                  <i className="fa-solid fa-sack-dollar"></i> {pkg.name}
-                </h5>
-                <hr />
-                <p><strong>Price:</strong> ₹{pkg.price}</p>
-                <p><strong>Duration:</strong> {pkg.duration}</p>
-                {pkg.features && pkg.features.length > 0 && (
-                  <ul className="mb-2">
-                    {pkg.features.map((feature, i) => (
-                      <li key={i}>✔ {feature}</li>
-                    ))}
-                  </ul>
+        <div className="packages-grid">
+          {packages.map((pkg, idx) => {
+            const isFeatured = idx === 1;
+            return (
+              <div 
+                key={pkg.id} 
+                className={`pkg-card ${isFeatured ? 'featured-card' : ''}`}
+              >
+                {isFeatured && (
+                  <div className="featured-ribbon">
+                    <Star size={11} fill="currentColor" /> MOST POPULAR
+                  </div>
                 )}
-                <div className="d-flex justify-content-end">
-                  <button
-                    className="dels btn-outline-danger"
+
+                <div className="card-top">
+                  <span className="badge-tag">
+                    {planBadges[idx % planBadges.length]}
+                  </span>
+                  <h3 className="plan-name">{pkg.name}</h3>
+
+                  <div className="price-container">
+                    <span className="currency">₹</span>
+                    <span className="amount">{formatPrice(pkg.price)}</span>
+                    <span className="term">/ {pkg.duration || 'Term'}</span>
+                  </div>
+                </div>
+
+                <div className="card-middle">
+                  <div className="duration-tag">
+                    <Clock size={13} />
+                    <span>Duration: {pkg.duration}</span>
+                  </div>
+
+                  <div className="perks-heading">WHAT'S INCLUDED</div>
+
+                  {pkg.features && pkg.features.length > 0 ? (
+                    <ul className="perks-list">
+                      {pkg.features.map((feature, i) => (
+                        <li key={i} className="perk-item">
+                          <span className="check-bubble">
+                            <Check size={11} />
+                          </span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="no-perks">Standard gym access included.</p>
+                  )}
+                </div>
+
+                <div className="card-bottom flex gap-2">
+                  <button className={`select-plan-btn ${isFeatured ? 'btn-primary' : 'btn-outline'}`}>
+                    <span>Active Package</span>
+                    <ChevronRight size={15} />
+                  </button>
+
+                  {/* Delete Button */}
+                  <button 
+                    className="delete-pkg-btn"
                     onClick={() => setConfirmId(pkg.id)}
+                    title="Delete Package"
                   >
-                    Delete
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* DELETE CONFIRMATION MODAL */}
       {confirmId && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex justify-content-center align-items-center">
-          <div className="bg-white p-4 m-4 rounded shadow" style={{ minWidth: '300px' }}>
-            <h5 className="mb-3">Confirm Deletion</h5>
-            <p>Are you sure you want to delete this package?</p>
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-secondary me-2" onClick={() => setConfirmId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmId)}>Yes, Delete</button>
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h5 className="modal-title">Confirm Deletion</h5>
+            <p className="modal-text">Are you sure you want to delete this package? This action cannot be undone.</p>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={() => setConfirmId(null)}>
+                Cancel
+              </button>
+              <button className="btn-confirm-delete" onClick={() => handleDelete(confirmId)}>
+                Yes, Delete
+              </button>
             </div>
           </div>
         </div>

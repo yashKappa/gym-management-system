@@ -1,33 +1,50 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../Firebase';
-
-const alertClasses = [
-  'alert-success',
-  'alert-info',
-  'alert-warning',
-  'alert-primary',
-  'alert-secondary',
-  'alert-danger',
-  'alert-dark',
-  'alert-light',
-  'alert-themed-blue',
-  'alert-neutral',
-  'alert-highlight',
-  'alert-urgent',
-  'alert-muted',
-  'alert-glow'
-];
+import { Utensils, Sparkles, ShieldAlert, Sun, Moon, Flame, Clock } from 'lucide-react';
+import './ViewDietPlans.css';
 
 const ViewDietPlans = () => {
   const [dietPlans, setDietPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-  const messageRef = useRef(null);
   const [activeTab, setActiveTab] = useState('beginner');
-
+  const messageRef = useRef(null);
   const mealOrder = ['breakfast', 'snack', 'lunch', 'snack2', 'dinner', 'post workout'];
   const normalize = (str) => str?.toLowerCase().replace(/\s+/g, '');
+
+  // Read theme directly from localStorage (defaults to dark mode)
+ // 1. Theme State Initialization
+const [isDarkMode, setIsDarkMode] = useState(() => {
+  const savedTheme = localStorage.getItem('appTheme');
+  return savedTheme ? savedTheme === 'dark' : true;
+});
+
+// 2. Listen to Global Theme Events from Navbar or Other Pages
+useEffect(() => {
+  const syncTheme = () => {
+    const saved = localStorage.getItem('appTheme');
+    setIsDarkMode(saved ? saved === 'dark' : true);
+  };
+
+  window.addEventListener('themeChange', syncTheme);
+  window.addEventListener('storage', syncTheme);
+
+  return () => {
+    window.removeEventListener('themeChange', syncTheme);
+    window.removeEventListener('storage', syncTheme);
+  };
+}, []);
+
+// 3. Child Toggle Action Dispatches Event
+const handleThemeToggle = () => {
+  setIsDarkMode((prev) => {
+    const newMode = !prev;
+    localStorage.setItem('appTheme', newMode ? 'dark' : 'light');
+    window.dispatchEvent(new Event('themeChange')); // Sync navbar & other components
+    return newMode;
+  });
+};
 
   const showMessage = (msg) => {
     setMessage(msg);
@@ -51,60 +68,95 @@ const ViewDietPlans = () => {
       }
     );
 
-    // Cleanup listener on unmount
     return () => unsubscribe();
-  },);
+  }, []); // Added dependency array to avoid infinite snapshot listeners
+
+  useEffect(() => {
+    if (message && messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      messageRef.current.focus();
+    }
+  }, [message]);
 
   const filteredPlans = dietPlans
     .filter(plan => plan.level?.toLowerCase() === activeTab)
     .sort((a, b) => {
       const indexA = mealOrder.indexOf(normalize(a.mealType));
       const indexB = mealOrder.indexOf(normalize(b.mealType));
-      return indexA - indexB;
+      return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
     });
 
   return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>🏋️‍♂️ Gym Diet Plans</h3>
+    <div className={`diet-theme-wrapper ${isDarkMode ? 'dark' : 'light'}`}>
+      {/* THEME TOGGLE BUTTON */}
+      <button 
+        className="theme-toggle-btn" 
+        onClick={handleThemeToggle}
+        title="Toggle Light/Dark Mode"
+      >
+        {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+        <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+      </button>
+
+      {/* HEADER SECTION */}
+      <div className="diet-header">
+        <div className="header-badge">
+          <Utensils size={14} /> NUTRITION & MEALS
+        </div>
+        <h2 className="header-title">Gym Diet Plans</h2>
+        <p className="header-subtitle">Follow customized meal plans engineered for your fitness level.</p>
       </div>
 
+      {/* ALERT TOAST */}
       {message && (
-        <div ref={messageRef} className="alert alert-info">
-          {message}
+        <div ref={messageRef} tabIndex={-1} className="theme-toast">
+          <ShieldAlert size={16} />
+          <span>{message}</span>
         </div>
       )}
 
-      <ul className="Diet nav nav-tabs justify-content-center mb-4">
+      {/* LEVEL TABS */}
+      <div className="tabs-container">
         {['beginner', 'regular', 'professional'].map(level => (
-          <li key={level} className="nav-item">
-            <button
-              className={`nav-link ${activeTab === level ? 'active' : ''}`}
-              onClick={() => setActiveTab(level)}
-            >
-              {level.charAt(0).toUpperCase() + level.slice(1)}
-            </button>
-          </li>
+          <button
+            key={level}
+            className={`tab-btn ${activeTab === level ? 'active' : ''}`}
+            onClick={() => setActiveTab(level)}
+          >
+            <Flame size={14} className="tab-icon" />
+            <span>{level.charAt(0).toUpperCase() + level.slice(1)}</span>
+          </button>
         ))}
-      </ul>
+      </div>
 
-      {filteredPlans.length === 0 ? (
-        <div className="text-center mt-4">
-          <img
-            src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Plans"
-            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
-          />
-          <p style={{ margin: 0 }}>No Diet plan found for this level.</p>
+      {/* CONTENT AREA */}
+      {loading ? (
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Loading meal schedules...</p>
+        </div>
+      ) : filteredPlans.length === 0 ? (
+        <div className="empty-state">
+          <Sparkles size={38} className="empty-icon" />
+          <h3>No Meal Plan Found</h3>
+          <p>There are no diet plans registered under the {activeTab} tier.</p>
         </div>
       ) : (
-        <div className="row g-4">
-          {filteredPlans.map((plan, idx) => (
-            <div className="col-12 col-md-6" key={plan.id}>
-              <div className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
-                <h5 className="alert-heading">{plan.mealType}</h5>
-                <hr />
-                <p>{plan.items}</p>
+        <div className="diet-grid">
+          {filteredPlans.map((plan) => (
+            <div key={plan.id} className="meal-card">
+              <div className="card-top-bar">
+                <span className="meal-badge">
+                  <Clock size={12} /> {plan.mealType?.toUpperCase() || 'MEAL'}
+                </span>
+                <span className="level-tag">{activeTab.toUpperCase()}</span>
+              </div>
+
+              <div className="card-body">
+                <h4 className="meal-title">{plan.mealType || 'Scheduled Meal'}</h4>
+                <div className="items-box">
+                  <p className="items-text">{plan.items || 'No items listed for this meal.'}</p>
+                </div>
               </div>
             </div>
           ))}

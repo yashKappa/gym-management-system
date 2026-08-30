@@ -1,0 +1,269 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+/* ========================================================
+   THEME VARIABLES (DARK + LIGHT)
+   ======================================================== */
+.diet-theme-wrapper.light {
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-badge: #e0f2fe;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --accent-badge: #0284c7;
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --card-shadow: 0 4px 15px -2px rgba(0, 0, 0, 0.04);
+  --toast-bg: #f0fdf4;
+  --toast-border: #bbf7d0;
+  --toast-color: #15803d;
+  --btn-bg: #ffffff;
+  --btn-text: #0f172a;
+  --tab-active-bg: #0f172a;
+  --tab-active-text: #ffffff;
+}
+
+.diet-theme-wrapper.dark {
+  --bg-main: #0a0a0c;
+  --bg-card: #121215;
+  --bg-subtle: #1a1a22;
+  --bg-badge: rgba(37, 99, 235, 0.15);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-badge: #60a5fa;
+  --border-color: #27273a;
+  --border-hover: #3b3b54;
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  --toast-bg: rgba(34, 197, 94, 0.1);
+  --toast-border: rgba(34, 197, 94, 0.25);
+  --toast-color: #4ade80;
+  --btn-bg: #1a1a22;
+  --btn-text: #f8fafc;
+  --tab-active-bg: #3b82f6;
+  --tab-active-text: #ffffff;
+}
+
+/* ========================================================
+   BASE CONTAINER
+   ======================================================== */
+.diet-theme-wrapper {
+  position: relative;
+  background-color: var(--bg-main);
+  min-height: 100vh;
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* THEME TOGGLE BUTTON */
+
+
+/* HEADER STYLES */
+.diet-header {
+  text-align: center;
+  max-width: 550px;
+  margin: 0 auto 1.25rem auto;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-badge);
+  color: var(--accent-badge);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+
+.header-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+.header-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* TOAST ALERT */
+.theme-toast {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--toast-bg);
+  border: 1px solid var(--toast-border);
+  color: var(--toast-color);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  max-width: 450px;
+  margin: 0 auto 1.25rem auto;
+}
+
+/* TABS STYLING */
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+  border-color: var(--tab-active-bg);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+/* DIET GRID */
+.diet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* CARD STYLING */
+.meal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s ease;
+}
+
+.meal-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-hover);
+}
+
+.card-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.meal-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-badge);
+  color: var(--accent-badge);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.level-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.meal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  text-transform: capitalize;
+}
+
+.items-box {
+  background-color: var(--bg-subtle);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.items-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* LOADING & EMPTY STATES */
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-badge);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px dashed var(--border-color);
+  color: var(--text-secondary);
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.empty-state h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+.empty-icon {
+  color: var(--text-muted);
+}
