@@ -1,29 +1,47 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../Firebase';
-import { FaDumbbell } from 'react-icons/fa';
-
-const alertClasses = [
-  'alert-success',
-  'alert-info',
-  'alert-warning',
-  'alert-primary',
-  'alert-secondary',
-  'alert-danger',
-  'alert-dark',
-  'alert-light',
-  'alert-themed-blue',
-  'alert-neutral',
-  'alert-highlight',
-  'alert-urgent',
-  'alert-muted',
-  'alert-glow'
-];
+import { Dumbbell, Sparkles, ShieldAlert, Sun, Moon, PackageCheck } from 'lucide-react';
+import './SupplementsFetch.css';
 
 const SupplementsFetch = () => {
   const [supplements, setSupplements] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const messageRef = useRef(null);
+
+  // Read theme directly from localStorage (defaults to dark mode)
+  // 1. Theme State Initialization
+const [isDarkMode, setIsDarkMode] = useState(() => {
+  const savedTheme = localStorage.getItem('appTheme');
+  return savedTheme ? savedTheme === 'dark' : true;
+});
+
+// 2. Listen to Global Theme Events from Navbar or Other Pages
+useEffect(() => {
+  const syncTheme = () => {
+    const saved = localStorage.getItem('appTheme');
+    setIsDarkMode(saved ? saved === 'dark' : true);
+  };
+
+  window.addEventListener('themeChange', syncTheme);
+  window.addEventListener('storage', syncTheme);
+
+  return () => {
+    window.removeEventListener('themeChange', syncTheme);
+    window.removeEventListener('storage', syncTheme);
+  };
+}, []);
+
+// 3. Child Toggle Action Dispatches Event
+const handleThemeToggle = () => {
+  setIsDarkMode((prev) => {
+    const newMode = !prev;
+    localStorage.setItem('appTheme', newMode ? 'dark' : 'light');
+    window.dispatchEvent(new Event('themeChange')); // Sync navbar & other components
+    return newMode;
+  });
+};
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -34,6 +52,7 @@ const SupplementsFetch = () => {
           ...doc.data()
         }));
         setSupplements(dataList);
+        setLoading(false);
         setMessage('Supplements updated.');
         setTimeout(() => setMessage(''), 3000);
       },
@@ -41,50 +60,85 @@ const SupplementsFetch = () => {
         console.error('❌ Error in real-time update:', error);
         setMessage('Real-time update failed.');
         setTimeout(() => setMessage(''), 3000);
+        setLoading(false);
       }
     );
 
-    // Clean up on unmount
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (message && messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      messageRef.current.focus();
+    }
+  }, [message]);
+
   return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>💪 Supplements</h3>
+    <div className={`supplements-theme-wrapper ${isDarkMode ? 'dark' : 'light'}`}>
+      {/* THEME TOGGLE BUTTON */}
+      <button 
+        className="theme-toggle-btn" 
+        onClick={handleThemeToggle}
+        title="Toggle Light/Dark Mode"
+      >
+        {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+        <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+      </button>
+
+      {/* HEADER SECTION */}
+      <div className="supplements-header">
+        <div className="header-badge">
+          <Dumbbell size={14} /> GYM NUTRITION
+        </div>
+        <h2 className="header-title">Supplements Store</h2>
+        <p className="header-subtitle">Browse recommended supplements, proteins, and fitness essentials.</p>
       </div>
 
+      {/* ALERT TOAST */}
       {message && (
-        <div ref={messageRef} className="alert alert-info">
-          {message}
+        <div ref={messageRef} tabIndex={-1} className="theme-toast">
+          <ShieldAlert size={16} />
+          <span>{message}</span>
         </div>
       )}
 
-      {supplements.length === 0 ? (
-        <div className="text-center mt-4">
-          <img
-            src={`${process.env.PUBLIC_URL}/assets/back.png`}
-            alt="No Supplements"
-            style={{ width: '10%', marginBottom: '10px', marginTop: '20px' }}
-          />
-          <p style={{ margin: 0 }}>No Supplements found.</p>
+      {/* CONTENT AREA */}
+      {loading ? (
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Loading supplements catalog...</p>
+        </div>
+      ) : supplements.length === 0 ? (
+        <div className="empty-state">
+          <Sparkles size={38} className="empty-icon" />
+          <h3>No Supplements Found</h3>
+          <p>There are currently no active supplements listed in the system.</p>
         </div>
       ) : (
-        <div className="row g-4">
-          {supplements.map((supplement, idx) => (
-            <div className="col-12 col-md-6" key={supplement.id}>
-              <div className={`alert ${alertClasses[idx % alertClasses.length]} shadow-sm`}>
-                <h5 className="alert-heading d-flex align-items-center gap-2">
-                  <FaDumbbell /> {supplement.name || 'No Name'}
-                </h5>
-                <hr />
+        <div className="supplements-grid">
+          {supplements.map((item) => (
+            <div key={item.id} className="supplement-card">
+              <div className="card-image-wrapper">
                 <img
-                  src={supplement.image || '/default.jpg'}
-                  alt={supplement.name}
-                  className="img-fluid rounded mb-2"
-                  style={{ maxHeight: '150px', objectFit: 'cover' }}
+                  src={item.image || '/assets/back.png'}
+                  alt={item.name || 'Supplement'}
+                  className="supplement-image"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `${process.env.PUBLIC_URL}/assets/back.png`;
+                  }}
                 />
-                <p>{supplement.description || 'No description available.'}</p>
+                <span className="stock-badge">
+                  <PackageCheck size={12} /> AVAILABLE
+                </span>
+              </div>
+
+              <div className="card-details">
+                <h4 className="supplement-title">{item.name || 'Unnamed Product'}</h4>
+                <p className="supplement-description">
+                  {item.description || 'No detailed description available for this supplement.'}
+                </p>
               </div>
             </div>
           ))}

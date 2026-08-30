@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../../Firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import ReceiptData from './ReceiptData';
+import { X, CheckCircle2, AlertCircle, FileText } from 'lucide-react';
 
-const Receipt = ({ member, onClose }) => {
+const Receipt = ({ member, onClose, isDarkMode }) => {
   const today = new Date().toISOString().split('T')[0];
 
   const [amountPaid, setAmountPaid] = useState('');
@@ -12,9 +13,8 @@ const Receipt = ({ member, onClose }) => {
   const [message, setMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [monthName, setMonthName] = useState('');
   const messageRef = useRef(null);
-  const [monthName, setMonthName] = useState(''); 
-
 
   useEffect(() => {
     if ((message || errorMessage) && messageRef.current) {
@@ -23,22 +23,15 @@ const Receipt = ({ member, onClose }) => {
     }
   }, [message, errorMessage]);
 
-
   if (!member) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setMessage('');
     setErrorMessage('');
 
-    if (!amountPaid) {
-      setErrorMessage('Please enter the amount paid.');
-      return;
-    }
-
-    if (!months) {
-      setErrorMessage('Please enter the number of months.');
+    if (!amountPaid || !months) {
+      setErrorMessage('Please fill in both Amount Paid and Months.');
       return;
     }
 
@@ -49,7 +42,7 @@ const Receipt = ({ member, onClose }) => {
       await addDoc(receiptCollectionRef, {
         amountPaid: Number(amountPaid),
         months: Number(months),
-          monthName: monthName.trim(), 
+        monthName: monthName.trim(),
         date,
         createdAt: serverTimestamp(),
         trainer: member.trainer,
@@ -74,98 +67,97 @@ const Receipt = ({ member, onClose }) => {
   };
 
   return (
-    <div className="card p-4 mt-0">
-      <div className="d-flex justify-content-between align-items-center">
-        <h5>Receipt Form for <strong>{member.name}</strong></h5>
-        <button className="btn btn-outline-danger btn-sm" onClick={onClose}>Close</button>
-      </div>
-
-      {(message || errorMessage) && (
-        <div
-          tabIndex={-1}
-          ref={messageRef}
-          className={`alert mt-3 ${message ? 'alert-success' : 'alert-danger'}`}
-          aria-live="assertive"
-          role="alert"
-        >
-          {message || errorMessage}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div className="row mt-3">
-          <div className="col-md-6">
-            <label className="form-label">Name</label>
-            <input type="text" className="form-control" value={member.name} readOnly />
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">Contact</label>
-            <input type="text" className="form-control" value={member.contact} readOnly />
-          </div>
-          <div className="col-md-6 mt-3">
-            <label className="form-label">Trainer</label>
-            <input type="text" className="form-control" value={member.trainer} readOnly />
-          </div>
-          <div className="col-md-6 mt-3">
-            <label className="form-label">Access Code</label>
-            <input type="text" className="form-control" value={member.accessCode} readOnly />
-          </div>
-          <div className="col-md-6 mt-3">
-            <label className="form-label">Amount Paid</label>
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Enter Amount"
-              value={amountPaid}
-              onChange={e => setAmountPaid(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div className="col-md-6 mt-3">
-            <label className="form-label">Months</label>
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Enter Months"
-              value={months}
-              onChange={e => setMonths(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div className="col-md-6 mt-3">
-  <label className="form-label">Month Name</label>
-  <input
-    type="text"
-    className="form-control"
-    placeholder="Enter Month Name (e.g., January)"
-    value={monthName}
-    onChange={e => setMonthName(e.target.value)}
-    disabled={loading}
-  />
-</div>
-          <div className="col-md-6 mt-3 d-none">
-            <label className="form-label">Date</label>
-            <input
-              type="date"
-              className="form-control"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </div>
-        </div>
-
-        <div className="sub mt-4">
-          <button type="submit" className="gen" disabled={loading}>
-            {loading ? 'Saving...' : 'Generate Receipt'}
+    <div className="modal-overlay">
+      <div className="modal-card" style={{ maxWidth: '750px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="modal-title d-flex align-items-center gap-2">
+            <FileText size={18} /> Receipt Form for {member.name}
+          </h5>
+          <button className="btn-remove-feature" onClick={onClose}>
+            <X size={16} />
           </button>
         </div>
-      </form>
 
-      <ReceiptData memberName={member.name} />
+        {message && (
+          <div className="alert-banner success mb-3" ref={messageRef} tabIndex={-1}>
+            <CheckCircle2 size={16} />
+            <span>{message}</span>
+          </div>
+        )}
+        {errorMessage && (
+          <div className="alert-banner danger mb-3" ref={messageRef} tabIndex={-1}>
+            <AlertCircle size={16} />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="row g-3">
+            <div className="col-md-6">
+              <label className="input-label-custom">Name</label>
+              <input type="text" className="custom-input-field" value={member.name} readOnly />
+            </div>
+            <div className="col-md-6">
+              <label className="input-label-custom">Contact</label>
+              <input type="text" className="custom-input-field" value={member.contact} readOnly />
+            </div>
+            <div className="col-md-6">
+              <label className="input-label-custom">Trainer</label>
+              <input type="text" className="custom-input-field" value={member.trainer} readOnly />
+            </div>
+            <div className="col-md-6">
+              <label className="input-label-custom">Access Code</label>
+              <input type="text" className="custom-input-field" value={member.accessCode} readOnly />
+            </div>
+            <div className="col-md-4">
+              <label className="input-label-custom">Amount Paid (₹)</label>
+              <input
+                type="number"
+                className="custom-input-field"
+                placeholder="e.g. 1500"
+                value={amountPaid}
+                onChange={(e) => setAmountPaid(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="col-md-4">
+              <label className="input-label-custom">Duration (Months)</label>
+              <input
+                type="number"
+                className="custom-input-field"
+                placeholder="e.g. 3"
+                value={months}
+                onChange={(e) => setMonths(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+            <div className="col-md-4">
+              <label className="input-label-custom">Month Name</label>
+              <input
+                type="text"
+                className="custom-input-field"
+                placeholder="e.g. January"
+                value={monthName}
+                onChange={(e) => setMonthName(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 text-end">
+            <button type="submit" className="btn-save-package" disabled={loading}>
+              {loading ? 'Saving...' : 'Generate Receipt'}
+            </button>
+          </div>
+        </form>
+
+        <hr className="my-4" style={{ borderColor: 'var(--border-color)' }} />
+
+        {/* RECEIPT HISTORY */}
+        <ReceiptData memberName={member.name} />
+      </div>
     </div>
   );
 };
