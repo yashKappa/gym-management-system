@@ -56,7 +56,6 @@
   flex-grow: 1;
 }
 
-/* Sidebar Item States */
 .sidebar-item {
   border-radius: 8px;
   cursor: pointer;
@@ -111,7 +110,6 @@
   margin-bottom: 1rem;
 }
 
-/* Sidebar Overlay Backdrop */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -119,7 +117,7 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999; /* Positioned right below the sliding sidebar drawer */
+  z-index: 999; 
 }
 
 .logo-img {
