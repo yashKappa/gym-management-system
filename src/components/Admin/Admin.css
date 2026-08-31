@@ -63,7 +63,7 @@
   transition: all 0.2s ease;
   font-weight: 500;
   border: 1px solid rgba(2, 56, 38, 0);
-  color: var(--text-muted);
+  color: #94a3b8;
 }
 
 .sidebar-item:hover {
@@ -76,7 +76,7 @@
   font-weight: 700;
   box-shadow: 0 0px 5px rgba(16, 185, 129, 0.25);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  color: var(--text-primary);
+  color: white;
 } 
 
 .name{
