@@ -12,17 +12,20 @@
   --background-color: #1e293b;
   --text-color: rgb(252, 251, 251);
   --background-hover: #334155;
+  --active-color: #045c3f3b;
+
 }
 
 .light-theme-admin {
   background-color: #f8f9fa;
   color: #1e293b;
-  --text-muted: #515152;
+  --text-muted: #1b1b1b;
   --text-primary: #1e293b;
   --border-color: rgb(54, 54, 54);
   --background-color: #f8f9fa;
   --text-color: #1e293b;
   --background-hover: #e7e8eb;
+  --active-color: #0abe82b7;
 }
 
 .sidebar {
@@ -62,7 +65,7 @@
   transition: all 0.2s ease;
   font-weight: 500;
   border: 1px solid rgba(2, 56, 38, 0);
-  color: #94a3b8;
+  color: var(--text-muted)
 }
 
 .sidebar-item:hover {
@@ -71,7 +74,7 @@
 }
 
 .sidebar-item.active {
-  background: #045c3f3b !important;
+  background: var(--active-color) !important;
   font-weight: 700;
   box-shadow: 0 0px 5px rgba(16, 185, 129, 0.25);
   border: 1px solid rgba(16, 185, 129, 0.3);
@@ -137,6 +140,15 @@
   .logo-img {
     display: flex;
   }
+
+  .sidebar-item {
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: 1px solid rgba(2, 56, 38, 0);
+  color: rgb(192, 190, 190);
+}
 }
 
 .gen {
